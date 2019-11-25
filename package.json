@@ -1,0 +1,39 @@
+{
+  "name": "AoC-2019",
+  "version": "1.0.0",
+  "description": "Advent of Code 2019",
+  "main": "index.js",
+  "engines": {
+    "node": ">=12.4.0"
+  },
+  "repository": "https://github.com/josepot/AoC-2019",
+  "author": "Josep M Sobrepere",
+  "license": "MIT",
+  "dependencies": {
+    "immutable": "^4.0.0-rc.12",
+    "priorityqueuejs": "^1.0.0",
+    "ramda": "^0.26.1",
+    "rxjs": "^6.5.3"
+  },
+  "devDependencies": {
+    "cross-env": "^6.0.3",
+    "eslint": "^6.7.1",
+    "husky": "^3.1.0",
+    "lint-staged": "^9.4.3",
+    "prettier": "^1.13.7"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write --with-node-modules",
+      "git add"
+    ]
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.js\" --with-node-modules"
+  }
+}
