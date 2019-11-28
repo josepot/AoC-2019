@@ -10,12 +10,16 @@
   "author": "Josep M Sobrepere",
   "license": "MIT",
   "dependencies": {
+    "id-permutations": "^1.0.3",
     "immutable": "^4.0.0-rc.12",
+    "md5": "^2.2.1",
     "priorityqueuejs": "^1.0.0",
     "ramda": "^0.26.1",
     "rxjs": "^6.5.3"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.9.0",
+    "@typescript-eslint/parser": "^2.9.0",
     "cross-env": "^6.0.3",
     "eslint": "^6.7.1",
     "husky": "^3.1.0",
