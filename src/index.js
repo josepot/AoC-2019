@@ -1,4 +1,4 @@
-const { compose: c, init, split, tap } = require("ramda");
+const { compose: c, init, split, tap, ifElse, head } = require("ramda");
 const { promisify } = require("util");
 const fs = require("fs");
 const { isObservable } = require("rxjs");
@@ -13,7 +13,10 @@ const log = v => {
   console.log(`Solved in ${end - start}ms`);
 };
 const readFile = promisify(fs.readFile);
-const getLines = c(init, split("\n"));
+const getLines = c(
+  ifElse(x => x.length > 1, init, head),
+  split("\n")
+);
 
 const [, , day_, idx] = process.argv;
 const day = day_ || new Date().getDate();
