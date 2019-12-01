@@ -25,6 +25,7 @@
     "husky": "^3.1.0",
     "lint-staged": "^9.4.3",
     "prettier": "^1.13.7",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^3.7.2"
   },
   "husky": {
@@ -39,6 +40,9 @@
     ]
   },
   "scripts": {
-    "format": "prettier --write \"src/**/*.js\" --with-node-modules"
+    "format": "prettier --write \"src/**/*.js\" --with-node-modules",
+    "ts-solution": "ts-node -r tsconfig-paths/register ./src/index.js",
+    "js-solution": "node ./src/index.js",
+    "download": "node ./src/downloadInput.js"
   }
 }

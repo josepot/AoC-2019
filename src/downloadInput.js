@@ -1,14 +1,16 @@
 const fs = require("fs");
+const path = require("path");
 const https = require("https");
+const getSession = require("./getSession");
 
+const relPath = path.resolve(__dirname);
 const [, , day_, year_] = process.argv;
 const now = new Date();
 
 const year = year_ || now.getFullYear();
 const day = day_ || now.getDate();
-const session = process.env.session;
 
-const getFile = () =>
+const getFile = session =>
   new Promise((resolve, reject) =>
     https
       .get(
@@ -27,13 +29,14 @@ const getFile = () =>
 
 const writeFile = stream =>
   new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(`./${day}/input`);
+    const file = fs.createWriteStream(`${relPath}/${day}/input`);
     stream.pipe(file);
     file.on("finish", file.close.bind(file, resolve));
     file.on("error", reject);
   });
 
-getFile()
+getSession()
+  .then(getFile)
   .then(writeFile)
   .catch(e => {
     console.log("Error downloading the file");
