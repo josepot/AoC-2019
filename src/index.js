@@ -1,8 +1,14 @@
 const { compose: c, init, split, tap, ifElse, head } = require("ramda");
 const { promisify } = require("util");
+const readline = require("readline");
 const fs = require("fs");
+const path = require("path");
 const { isObservable } = require("rxjs");
+const https = require("https");
+const qs = require("querystring");
+const getSession = require("./getSession");
 
+const relPath = path.resolve(__dirname);
 let start;
 const log = v => {
   let end = Date.now();
@@ -18,10 +24,23 @@ const getLines = c(
   split("\n")
 );
 
-const [, , day_, idx] = process.argv;
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+const askQuestion = x => new Promise(res => rl.question(x, res));
+
+const [cmdName, , day_, idx] = process.argv;
 const day = day_ || new Date().getDate();
 
-const fns = require(`./${day}/solution`);
+const dayPath = `${relPath}/${day}`;
+
+const mod = cmdName.endsWith("ts-node")
+  ? require(`./${day}/solution.ts`)
+  : require(`./${day}/solution`);
+
+const fns = mod.default || mod;
 const fn =
   idx !== undefined
     ? fns[idx]
@@ -29,9 +48,76 @@ const fn =
     ? fns.filter(Boolean).slice(-1)[0]
     : fns;
 
-readFile(`./${day}/input`, "utf-8").then(
+const submitSolution = async (solution, level, session) => {
+  const defaultYear = new Date().getFullYear();
+  const year_ = await askQuestion(`year? (${defaultYear})`);
+  const year = !year_ ? defaultYear : year_;
+  console.log(
+    `Submitting solution ${solution} for day: ${day}, part: ${level}, year: ${year}`
+  );
+  const postData = qs.stringify({
+    level,
+    answer: solution
+  });
+
+  const result = await new Promise((resolve, reject) => {
+    const request = https.request(
+      {
+        hostname: "adventofcode.com",
+        path: `/${year}/day/${day}/answer`,
+        port: 443,
+        method: "POST",
+        headers: {
+          Cookie: `session=${session}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Length": postData.length
+        }
+      },
+      res => {
+        let result = "";
+        res.on("data", function(chunk) {
+          result += chunk;
+        });
+        res.on("end", function() {
+          resolve(result);
+        });
+        res.on("error", function(err) {
+          reject(err);
+        });
+      }
+    );
+    request.write(postData);
+    request.end();
+  });
+
+  if (result.includes("That's the right answer!")) {
+    console.log("\x1b[32m", "That's right!");
+  } else {
+    console.log(result);
+  }
+};
+
+const defaultPart = Array.isArray(fns) && fns.length;
+
+const submit = async solution => {
+  try {
+    const session = await getSession();
+    if (!session) return;
+
+    const part_ = await askQuestion(`submit part? (${defaultPart})`);
+    const part = !part_ ? defaultPart : Number(part_);
+    if (Number.isNaN(part)) return;
+
+    await submitSolution(solution, part, session);
+  } finally {
+    rl.close();
+  }
+};
+
+readFile(`${dayPath}/input`, "utf-8").then(
   c(
-    log,
+    submit,
+    tap(x => log(x)),
     fn,
     tap(() => (start = Date.now())),
     getLines
