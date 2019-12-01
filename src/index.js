@@ -48,10 +48,7 @@ const fn =
     ? fns.filter(Boolean).slice(-1)[0]
     : fns;
 
-const submitSolution = async (solution, level, session) => {
-  const defaultYear = new Date().getFullYear();
-  const year_ = await askQuestion(`year? (${defaultYear})`);
-  const year = !year_ ? defaultYear : year_;
+const submitSolution = async (solution, level, session, year) => {
   console.log(
     `Submitting solution ${solution} for day: ${day}, part: ${level}, year: ${year}`
   );
@@ -90,11 +87,24 @@ const submitSolution = async (solution, level, session) => {
     request.end();
   });
 
-  if (result.includes("That's the right answer!")) {
-    console.log("\x1b[32m", "That's right!");
-  } else {
-    console.log(result);
+  const [, main] = result.match(/<main>((.|\n)*)<\/main>/);
+
+  if (main.includes("That's the right answer!")) {
+    return console.log("\x1b[32m", "That's right!");
   }
+
+  if (main.includes("That's not the right answer")) {
+    const [, extraInfo] = main.match(
+      /That's not the right answer;?\s?((.|\n)*)If you're stuck/
+    );
+    return console.log("\x1b[31m", `Wrong! ${extraInfo}`);
+  }
+
+  const [, secsStr] = main.match(/You\shave\s(\d*)s\sleft\sto\swait/);
+  const secsToWait = Number(secsStr);
+  console.log(`Waiting ${secsStr} seconds before re-submitting...`);
+  await new Promise(res => setTimeout(res, secsToWait * 1000));
+  await submitSolution(solution, level, session, year);
 };
 
 const defaultPart = Array.isArray(fns) && fns.length;
@@ -108,7 +118,11 @@ const submit = async solution => {
     const part = !part_ ? defaultPart : Number(part_);
     if (Number.isNaN(part)) return;
 
-    await submitSolution(solution, part, session);
+    const defaultYear = new Date().getFullYear();
+    const year_ = await askQuestion(`year? (${defaultYear})`);
+    const year = !year_ ? defaultYear : year_;
+
+    await submitSolution(solution, part, session, year);
   } finally {
     rl.close();
   }
