@@ -1,4 +1,4 @@
-const range = (start: number, limit: number) =>
+export const range = (start: number, limit: number) =>
   Array(limit - start)
     .fill(null)
     .map((_, idx) => start + idx);

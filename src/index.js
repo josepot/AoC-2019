@@ -93,18 +93,23 @@ const submitSolution = async (solution, level, session, year) => {
     return console.log("\x1b[32m", "That's right!");
   }
 
-  if (main.includes("That's not the right answer")) {
-    const [, extraInfo] = main.match(
-      /That's not the right answer;?\s?((.|\n)*)If you're stuck/
-    );
-    return console.log("\x1b[31m", `Wrong! ${extraInfo}`);
+  const wrongMatch = main.match(
+    /That's not the right answer;?\s?((.|\n)*)If you're stuck/
+  );
+  if (wrongMatch) {
+    return console.log("\x1b[31m", `Wrong! ${wrongMatch[1]}`);
   }
 
-  const [, secsStr] = main.match(/You\shave\s(\d*)s\sleft\sto\swait/);
-  const secsToWait = Number(secsStr);
-  console.log(`Waiting ${secsStr} seconds before re-submitting...`);
-  await new Promise(res => setTimeout(res, secsToWait * 1000));
-  await submitSolution(solution, level, session, year);
+  const waitMatch = main.match(/You\shave\s(\d*)s\sleft\sto\swait/);
+
+  if (waitMatch) {
+    const secsToWait = Number(waitMatch[1]);
+    console.log(`Waiting ${secsToWait} seconds before re-submitting...`);
+    await new Promise(res => setTimeout(res, secsToWait * 1000));
+    return await submitSolution(solution, level, session, year);
+  }
+
+  console.log(main);
 };
 
 const defaultPart = Array.isArray(fns) && fns.length;
