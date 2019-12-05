@@ -18,6 +18,7 @@
     "rxjs": "^6.5.3"
   },
   "devDependencies": {
+    "@types/priorityqueuejs": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "cross-env": "^6.0.3",
