@@ -7,16 +7,8 @@ const getMaps = (lines: string[]) => {
   lines
     .map(line => line.split(")"))
     .forEach(([a, b]) => {
-      if (!map.has(a)) {
-        map.set(a, new Set([b]));
-      } else {
-        map.get(a)!.add(b);
-      }
-      if (reverseMap.has(b)) {
-        throw new Error("not expected");
-      } else {
-        reverseMap.set(b, a);
-      }
+      map.get(a)?.add(b) || map.set(a, new Set([b]));
+      reverseMap.set(b, a);
     });
   return [map, reverseMap] as const;
 };
