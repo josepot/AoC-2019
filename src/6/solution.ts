@@ -8,15 +8,15 @@ interface Node {
 }
 
 const solution1 = (forward: Forward, backwards: Backwards) => {
+  const getOrbitsInTree = (root: string, depth = 0): number =>
+    [...(forward.get(root) || [])]
+      .map(x => getOrbitsInTree(x, depth + 1))
+      .reduce((a, b) => a + b, depth);
+
   let root: string = backwards.keys().next().value;
   while (backwards.has(root)) root = backwards.get(root)!;
 
-  const getOrbits = (currentCounter: number) => (current: string): number =>
-    [...(forward.get(current) || [])]
-      .map(getOrbits(currentCounter + 1))
-      .reduce((a, b) => a + b, currentCounter);
-
-  return getOrbits(0)(root);
+  return getOrbitsInTree(root);
 };
 
 const solution2 = (forward: Forward, backwards: Backwards) =>
