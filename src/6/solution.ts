@@ -3,12 +3,12 @@ interface Node {
   id: string;
   steps: number;
 }
-type SolutionFn = (
+type Solution = (
   map: Map<string, Set<string>>,
   reverseMap: Map<string, string>
 ) => number;
 
-const solution1: SolutionFn = (map, reverseMap) => {
+const solution1: Solution = (map, reverseMap) => {
   const orbits = new Map<string, number>();
   const getOrbits = (key: string): number => {
     if (orbits.has(key)) return orbits.get(key)!;
@@ -22,7 +22,7 @@ const solution1: SolutionFn = (map, reverseMap) => {
   return [...orbits.values()].reduce((a, b) => a + b);
 };
 
-const solution2: SolutionFn = (map, reverseMap) =>
+const solution2: Solution = (map, reverseMap) =>
   graphDistinctSearch(
     { id: "YOU", steps: 0 },
     (node: Node) =>
