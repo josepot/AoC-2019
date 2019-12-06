@@ -1,12 +1,9 @@
-import graphSearch from "../utils/ts/graphSearch";
-
+import graphDistinctSearch from "../utils/ts/graphDistinctSearch";
 export {};
 
-const solution1 = (lines: string[]) => {
+const getMaps = (lines: string[]) => {
   const map = new Map<string, Set<string>>();
   const reverseMap = new Map<string, string>();
-  const orbits = new Map<string, number>();
-
   lines
     .map(line => line.split(")"))
     .forEach(([a, b]) => {
@@ -21,23 +18,23 @@ const solution1 = (lines: string[]) => {
         reverseMap.set(b, a);
       }
     });
+  return [map, reverseMap] as const;
+};
 
-  const leafs = [...reverseMap.keys()].filter(x => !map.has(x));
-
+const solution1 = (
+  map: Map<string, Set<string>>,
+  reverseMap: Map<string, string>
+) => {
+  const orbits = new Map<string, number>();
   const getOrbits = (key: string): number => {
-    const prev = reverseMap.get(key);
-    if (!prev) {
-      orbits.set(key, 0);
-      return 0;
-    }
     if (orbits.has(key)) return orbits.get(key)!;
-    const result = getOrbits(prev) + 1;
+
+    const prev = reverseMap.get(key);
+    const result = prev ? getOrbits(prev) + 1 : 0;
     orbits.set(key, result);
     return result;
   };
-
-  leafs.forEach(x => getOrbits(x));
-
+  [...reverseMap.keys()].filter(x => !map.has(x)).forEach(x => getOrbits(x));
   return [...orbits.values()].reduce((a, b) => a + b);
 };
 
@@ -46,54 +43,23 @@ interface Node {
   steps: number;
 }
 
-const comparator = (a: Node, b: Node) => b.steps - a.steps;
-
-const solution2 = (lines: string[]) => {
-  const map = new Map<string, Set<string>>();
-  const reverseMap = new Map<string, string>();
-
-  const analizedNodes = new Map<string, Node>();
-
-  lines
-    .map(line => line.split(")"))
-    .forEach(([a, b]) => {
-      if (!map.has(a)) {
-        map.set(a, new Set([b]));
-      } else {
-        map.get(a)!.add(b);
-      }
-      if (reverseMap.has(b)) {
-        throw new Error("not expected");
-      } else {
-        reverseMap.set(b, a);
-      }
-    });
-
-  const initialNode: Node = { id: "YOU", steps: 0 };
-  analizedNodes.set("YOU", initialNode);
-
-  const analizer = (node: Node): Node[] | true => {
-    if (node.id === "SAN") return true;
-
-    const result: string[] = [...(map.get(node.id) || [])];
-    if (reverseMap.has(node.id)) {
-      result.push(reverseMap.get(node.id)!);
-    }
-    const steps = node.steps + 1;
-
-    return result
-      .filter(x => !analizedNodes.has(x))
-      .map(id => {
-        const res = {
+const solution2 = (
+  map: Map<string, Set<string>>,
+  reverseMap: Map<string, string>
+) =>
+  graphDistinctSearch(
+    { id: "YOU", steps: 0 },
+    (node: Node) =>
+      node.id === "SAN" ||
+      [...(map.get(node.id) || []), reverseMap.get(node.id) || ""]
+        .filter(Boolean)
+        .map(id => ({
           id,
-          steps
-        };
-        analizedNodes.set(id, res);
-        return res;
-      });
-  };
+          steps: node.steps + 1
+        })),
+    (a: Node, b: Node) => b.steps - a.steps
+  ).steps - 2;
 
-  return graphSearch(initialNode, analizer, comparator).steps - 2;
-};
-
-module.exports = [solution1, solution2];
+module.exports = [solution1, solution2].map(fn => (lines: string[]) =>
+  fn(...getMaps(lines))
+);
