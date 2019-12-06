@@ -1,30 +1,30 @@
 import graphDistinctSearch from "../utils/ts/graphDistinctSearch";
+
+type Forward = Map<string, Set<string>>;
+type Backwards = Map<string, string>;
 interface Node {
   id: string;
   steps: number;
 }
-type Solution = (
-  map: Map<string, Set<string>>,
-  reverseMap: Map<string, string>
-) => number;
 
-const solution1: Solution = (map, reverseMap) => {
-  let root: string = reverseMap.keys().next().value;
-  while (reverseMap.has(root)) root = reverseMap.get(root)!;
+const solution1 = (forward: Forward, backwards: Backwards) => {
+  let root: string = backwards.keys().next().value;
+  while (backwards.has(root)) root = backwards.get(root)!;
 
   const getOrbits = (currentCounter: number) => (current: string): number =>
-    [...(map.get(current) || [])]
+    [...(forward.get(current) || [])]
       .map(getOrbits(currentCounter + 1))
       .reduce((a, b) => a + b, currentCounter);
+
   return getOrbits(0)(root);
 };
 
-const solution2: Solution = (map, reverseMap) =>
+const solution2 = (forward: Forward, backwards: Backwards) =>
   graphDistinctSearch(
     { id: "YOU", steps: 0 },
     (node: Node) =>
       node.id === "SAN" ||
-      [...(map.get(node.id) || []), reverseMap.get(node.id) || ""]
+      [...(forward.get(node.id) || []), backwards.get(node.id) || ""]
         .filter(Boolean)
         .map(id => ({
           id,
@@ -34,13 +34,13 @@ const solution2: Solution = (map, reverseMap) =>
   ).steps - 2;
 
 export default [solution1, solution2].map(fn => (lines: string[]) => {
-  const map = new Map<string, Set<string>>();
-  const reverseMap = new Map<string, string>();
+  const forward: Forward = new Map();
+  const backwards: Backwards = new Map();
   lines
     .map(line => line.split(")"))
     .forEach(([a, b]) => {
-      map.get(a)?.add(b) || map.set(a, new Set([b]));
-      reverseMap.set(b, a);
+      forward.get(a)?.add(b) || forward.set(a, new Set([b]));
+      backwards.set(b, a);
     });
-  return fn(map, reverseMap);
+  return fn(forward, backwards);
 });
