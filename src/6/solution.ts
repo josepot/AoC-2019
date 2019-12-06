@@ -9,17 +9,14 @@ type Solution = (
 ) => number;
 
 const solution1: Solution = (map, reverseMap) => {
-  const orbits = new Map<string, number>();
-  const getOrbits = (key: string): number => {
-    if (orbits.has(key)) return orbits.get(key)!;
+  let root: string = reverseMap.keys().next().value;
+  while (reverseMap.has(root)) root = reverseMap.get(root)!;
 
-    const prev = reverseMap.get(key);
-    const result = prev ? getOrbits(prev) + 1 : 0;
-    orbits.set(key, result);
-    return result;
-  };
-  [...reverseMap.keys()].filter(x => !map.has(x)).forEach(x => getOrbits(x));
-  return [...orbits.values()].reduce((a, b) => a + b);
+  const getOrbits = (currentCounter: number) => (current: string): number =>
+    [...(map.get(current) || [])]
+      .map(getOrbits(currentCounter + 1))
+      .reduce((a, b) => a + b, currentCounter);
+  return getOrbits(0)(root);
 };
 
 const solution2: Solution = (map, reverseMap) =>
