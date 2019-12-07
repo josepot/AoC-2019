@@ -1,28 +1,24 @@
 const { getPermutationsFromId: gPFID } = require("id-permutations")(5);
 
-const nPermutations = 5 * 4 * 3 * 2;
-
 const getPermutationsFromId: (x: number) => number[] = (x: number) => {
   const result: number[] = gPFID(x);
   return result;
 };
+const nPermutations = 5 * 4 * 3 * 2;
 
 const solution1 = ([line]: string) => {
   let maxSolution = 0;
 
   for (let i = 0; i < nPermutations; i++) {
     const permutations = getPermutationsFromId(i);
-    const programs = permutations
-      .map(idx => getProgram(line, idx))
-      .map(([nextInput, generator]) => [nextInput, generator()] as const);
+    const generators = permutations
+      .map(idx => getGeneratorFn(line, idx))
+      .map(generator => generator());
 
     let output = 0;
     permutations.forEach(idx => {
-      let [nextInput, generator] = programs[idx];
-      generator.next();
-      nextInput(output);
-      generator.next();
-      output = generator.next().value as number;
+      generators[idx].next();
+      output = generators[idx].next(output).value as number;
     });
     maxSolution = Math.max(output, maxSolution);
   }
@@ -35,42 +31,32 @@ const solution2 = ([line]: string) => {
 
   for (let i = 0; i < nPermutations; i++) {
     const permutations = getPermutationsFromId(i);
+    const generators = permutations
+      .map(idx => getGeneratorFn(line, idx + 5))
+      .map(generator => generator());
 
-    const programs = permutations
-      .map(idx => getProgram(line, idx + 5))
-      .map(([nextInput, generator]) => [nextInput, generator()] as const);
-
-    let ii = 0;
     let lastOutput = 0;
+    let ii = 0;
     do {
-      let [setNnextInput, generator] = programs[ii % 5];
-      const result = generator.next().value;
-      if (result === "input") {
-        setNnextInput(lastOutput);
-        generator.next();
-        lastOutput = generator.next().value as number;
-      } else if (result === "finish") {
+      const generator = generators[ii++ % 5];
+      if (generator.next().done) {
         break;
-      } else {
-        throw new Error(`unnexpected state ${result}`);
       }
-      ii++;
+      lastOutput = generator.next(lastOutput).value as number;
     } while (true);
     maxSolution = Math.max(lastOutput, maxSolution);
   }
   return maxSolution;
 };
 
-const getProgram = (line: string, idx: number) => {
+const getGeneratorFn = (line: string, idx: number) => {
+  const EXIT_CODE = 99;
   let input = idx;
-  const nextInput = (x: number) => {
-    input = x;
-  };
-  function* generator() {
-    const instructions = line.split(",").map(Number);
+  const instructions = line.split(",").map(Number);
+
+  return function* generator() {
     let currentIdx = 0;
     let output: number = -1;
-    const EXIT_CODE = 99;
     let firstInput = true;
 
     const getArgs = (modes: number[], n: number) => {
@@ -116,8 +102,7 @@ const getProgram = (line: string, idx: number) => {
           if (firstInput) {
             firstInput = false;
           } else {
-            yield "input";
-            yield "input2";
+            input = yield "input";
           }
           save(input);
           break;
@@ -156,9 +141,7 @@ const getProgram = (line: string, idx: number) => {
         }
       }
     }
-    yield "finish";
-  }
-  return [nextInput, generator] as const;
+  };
 };
 
 export default [solution1, solution2];
