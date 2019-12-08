@@ -1,22 +1,15 @@
-const solution1 = ([line]: string) => {
-  const wide = 25;
-  const tall = 6;
-  const digitsInLayer = 25 * 6;
+const wide = 25;
+const tall = 6;
+const digitsInLayer = 25 * 6;
+enum Color {
+  W = "#",
+  B = " ",
+  T = "."
+}
 
-  const nLayers = line.length / digitsInLayer;
-  console.log("nLayers", nLayers);
-  const layers: number[][][] = [];
-  for (let l = 0; l < nLayers; l++) {
-    const layer: number[][] = [];
-    for (let y = 0; y < tall; y++) {
-      let pixel: number[] = [];
-      for (let x = 0; x < wide; x++) {
-        pixel.push(Number(line[l * digitsInLayer + (y * wide + x)]));
-      }
-      layer.push(pixel);
-    }
-    layers.push(layer);
-  }
+const colors = [Color.B, Color.W, Color.T];
+
+const solution1 = (layers: number[][][]) => {
   const winner = layers
     .map(layer =>
       layer
@@ -32,19 +25,23 @@ const solution1 = ([line]: string) => {
   return winner.get(1)! * winner.get(2)!;
 };
 
-enum Color {
-  W = "white",
-  B = "black",
-  T = "transparent"
-}
+const solution2 = (rawLayers: number[][][]) => {
+  const layers = rawLayers.map(layer =>
+    layer.map(row => row.map(digit => colors[digit]))
+  );
 
-const solution2 = ([line]: string) => {
-  const wide = 25;
-  const tall = 6;
-  const digitsInLayer = 25 * 6;
+  const getPixelColor = (y: number, x: number): Color =>
+    layers
+      .map((_, idx) => layers[idx][y][x])
+      .find(x => x === Color.B || x === Color.W) || Color.T;
 
+  layers[0].forEach((row, y) => {
+    console.log(row.map((_, x) => getPixelColor(y, x)).join(""));
+  });
+};
+
+export default [solution1, solution2].map(fn => ([line]: string[]) => {
   const nLayers = line.length / digitsInLayer;
-  console.log("nLayers", nLayers);
   const layers: number[][][] = [];
   for (let l = 0; l < nLayers; l++) {
     const layer: number[][] = [];
@@ -57,34 +54,5 @@ const solution2 = ([line]: string) => {
     }
     layers.push(layer);
   }
-
-  const getPixelInLayer = (y: number, x: number, layerIdx: number): Color => {
-    const digit = layers[layerIdx][y][x];
-    return digit === 0 ? Color.B : digit === 1 ? Color.W : Color.T;
-  };
-
-  const getPixelColor = (y: number, x: number): Color => {
-    return (
-      layers
-        .map((_, idx) => getPixelInLayer(y, x, idx))
-        .find(x => x === Color.B || x === Color.W) || Color.T
-    );
-  };
-
-  const rows: string[] = [];
-  for (let y = 0; y < tall; y++) {
-    const colors: Color[] = [];
-    for (let x = 0; x < wide; x++) {
-      colors.push(getPixelColor(y, x));
-    }
-    rows.push(
-      colors
-        .map(x => (x === Color.B ? " " : x === Color.W ? "#" : "."))
-        .join("")
-    );
-  }
-
-  rows.forEach(row => console.log(row));
-};
-
-export default [solution1, solution2];
+  return fn(layers);
+});
