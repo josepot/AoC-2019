@@ -33,29 +33,18 @@ const getAsteroidsInSight = (x: number, y: number): number => {
       );
 
       if (prevAngle) {
-        /*
-        console.log(
-          `position ${targetKey} found by angle: ${xAngle},${yAngle} blocked by prevAngle`,
-          prevAngle
-        );
-         */
         return;
       }
 
-      // console.log("detected", targetKey);
       blockedAngles.push([xAngle, yAngle]);
       detected.add(targetKey);
     });
   }
-
-  console.log(x, y, detected.size);
-
   return detected.size;
 };
 
 const solution1 = (lines: string[]) => {
   SIZE = lines.length;
-  // console.log("SIZE", SIZE);
   const positions: [number, number][] = [];
 
   lines.forEach((line, y) =>
@@ -69,8 +58,6 @@ const solution1 = (lines: string[]) => {
     .filter(([x, y]) => map.get([x, y].join(",")))
     .map(([x, y]) => getAsteroidsInSight(x, y))
     .sort((a, b) => b - a)[0];
-
-  //return getAsteroidsInSight(0, 3);
 };
 
 export default [solution1];
