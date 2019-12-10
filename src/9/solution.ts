@@ -10,24 +10,22 @@ const solution = (line: string, input: number) => {
     const args = new Array<number>(n);
     for (let i = 0; i < n; i++) {
       const mode = modes[i];
+      args[i] =
+        mode === 0
+          ? instructions[instructions[currentIdx++]]
+          : mode === 1
+          ? instructions[currentIdx++]
+          : instructions[instructions[currentIdx++] + relativeBase];
 
-      if (isWrite && i === n - 1) {
-        args[i] = instructions[currentIdx++] + (mode === 2 ? relativeBase : 0);
-      } else {
-        args[i] =
-          mode === 0
-            ? instructions[instructions[currentIdx++]]
-            : mode === 1
-            ? instructions[currentIdx++]
-            : instructions[instructions[currentIdx++] + relativeBase];
-      }
       args[i] = args[i] === undefined ? 0 : args[i];
     }
-    return args;
-  };
 
-  const save = (val: number, idx: number) => {
-    instructions[idx] = val;
+    if (isWrite) {
+      args.push(
+        instructions[currentIdx++] + (modes[n] === 2 ? relativeBase : 0)
+      );
+    }
+    return args;
   };
 
   while (instructions[currentIdx] !== EXIT_CODE) {
@@ -43,17 +41,18 @@ const solution = (line: string, input: number) => {
 
     switch (operationKey) {
       case 1: {
-        const [a, b, c] = getArgs(modes, 3, true);
-        save(a + b, c);
+        const [a, b, c] = getArgs(modes, 2, true);
+        instructions[c] = a + b;
         break;
       }
       case 2: {
-        const [a, b, c] = getArgs(modes, 3, true);
-        save(a * b, c);
+        const [a, b, c] = getArgs(modes, 2, true);
+        instructions[c] = a * b;
         break;
       }
       case 3: {
-        save(input, getArgs(modes, 1, true)[0]);
+        const [a] = getArgs(modes, 0, true);
+        instructions[a] = input;
         break;
       }
       case 4: {
@@ -75,13 +74,13 @@ const solution = (line: string, input: number) => {
         break;
       }
       case 7: {
-        const [a, b, c] = getArgs(modes, 3, true);
-        save(a < b ? 1 : 0, c);
+        const [a, b, c] = getArgs(modes, 2, true);
+        instructions[c] = a < b ? 1 : 0;
         break;
       }
       case 8: {
-        const [a, b, c] = getArgs(modes, 3, true);
-        save(a === b ? 1 : 0, c);
+        const [a, b, c] = getArgs(modes, 2, true);
+        instructions[c] = a === b ? 1 : 0;
         break;
       }
       case 9: {
