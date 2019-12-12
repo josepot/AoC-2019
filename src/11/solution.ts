@@ -1,4 +1,4 @@
-import intCodeGenerator from "utils/ts/getIntCodeGenerator";
+import intCodeGenerator from "utils/ts/intCodeGenerator";
 import { getDirectionWheel, movePosition, Position } from "utils/ts/directions";
 import printPositionsMap from "utils/ts/printPositionsMap";
 

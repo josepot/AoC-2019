@@ -49,10 +49,6 @@ const solution1 = (lines: string[]) => {
     .reduce(add);
 };
 
-const getMoonKey = (x: Moon): string => x[0].join(",") + x[1].join(",");
-const getMoonsKey = (x: Moon[]): string =>
-  x.map(getMoonKey).reduce((a, b) => a + b);
-
 const getMoonAxisKey = (moon: Moon, axis: number) =>
   [moon[0][axis], moon[1][axis]].join(",");
 const getMoonsAxisKey = (moons: Moon[], axis: number) =>
@@ -75,8 +71,8 @@ const findAxisPeriod = (lines: string[], axis: number) => {
 };
 
 const largestDivisor = (a_: number, b_: number) => {
-  let [a, b] = [a_, b_].map(Math.abs);
-  while (b) {
+  let [a, b] = [a_, b_];
+  while (b > 0) {
     const t = b;
     b = a % b;
     a = t;
@@ -84,7 +80,7 @@ const largestDivisor = (a_: number, b_: number) => {
   return a;
 };
 const minimumCommonMultiple = (a: number, b: number) =>
-  a === 0 || b === 0 ? 0 : Math.abs((a * b) / largestDivisor(a, b));
+  (a * b) / largestDivisor(a, b);
 
 const solution2 = (lines: string[]) =>
   [0, 1, 2]

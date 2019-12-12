@@ -3,8 +3,6 @@ const EXIT_CODE = 99;
 export default function* intCodeGenerator(line: string) {
   const instructions = line.split(",").map(Number);
   let currentIdx = 0;
-  let input: number;
-  let output: number = -1;
   let relativeBase = 0;
 
   const getArgs = (modes: number[], n: number, isWrite = false) => {
@@ -54,12 +52,11 @@ export default function* intCodeGenerator(line: string) {
         break;
       }
       case 3: {
-        input = yield "input";
-        save(input, getArgs(modes, 1, true)[0]);
+        save(yield "input", getArgs(modes, 1, true)[0]);
         break;
       }
       case 4: {
-        [output] = getArgs(modes, 1);
+        const [output] = getArgs(modes, 1);
         yield output;
         break;
       }
