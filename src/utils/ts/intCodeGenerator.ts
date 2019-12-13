@@ -114,20 +114,20 @@ export default function* intCodeGenerator(line: string) {
   }
 }
 
-export function intCodeProcessor(
+export function intCodeProcessor<T extends number>(
   line: string,
-  outputFn: (...args: number[]) => void,
-  getInputCb?: number | (() => number)
+  outputFn: (...args: T[]) => void,
+  getInputCb?: T | (() => T)
 ) {
   const generator = intCodeGenerator(line);
   let x: GeneratorResult;
-  let input: number = 0;
-  const getInput: undefined | (() => number) =
+  let input: T = Infinity as T;
+  const getInput: undefined | (() => T) =
     getInputCb === undefined || typeof getInputCb === "function"
       ? getInputCb
       : () => getInputCb;
 
-  const args = new Array<number>(outputFn.length);
+  const args = new Array<T>(outputFn.length);
   let i = 0;
 
   while ((x = generator.next(input).value) !== undefined) {
@@ -137,11 +137,15 @@ export function intCodeProcessor(
       }
       input = getInput();
     } else {
-      args[i++] = x;
+      args[i++] = x as T;
       if (i % args.length === 0) {
         outputFn(...args);
         i = 0;
       }
     }
+  }
+
+  if (!generator.next().done) {
+    throw new Error("intCodeGenerator yielded undefined");
   }
 }

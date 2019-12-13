@@ -13,7 +13,7 @@ const solution1 = ([line]: string) => {
 const solution2 = ([line]: string) => {
   let [score, ballX, myX] = [0, 0, 0];
 
-  intCodeProcessor(
+  intCodeProcessor<-1 | 0 | 1 | 2 | 3 | 4>(
     "2" + line.slice(1),
     (x, y, z) => {
       if (x === -1 && y === 0) {
