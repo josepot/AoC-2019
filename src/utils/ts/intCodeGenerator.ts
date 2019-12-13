@@ -7,9 +7,9 @@ export type GeneratorInputType<T> = T extends Generator<any, any, infer R>
   ? R
   : any;
 
-export type GeneratorResult = GeneratorReturnType<
-  ReturnType<typeof intCodeGenerator>
->;
+type IntCodeGenetator = ReturnType<typeof intCodeGenerator>;
+
+export type GeneratorResult = GeneratorReturnType<IntCodeGenetator>;
 
 const getOperationKeyModes = (x: number) => {
   const operationKeyRaw = x.toString(10).padStart(5, "0");
@@ -114,18 +114,81 @@ export default function* intCodeGenerator(line: string) {
   }
 }
 
-export function intCodeProcessor<T extends number>(
+// WIP
+export function* plugGenerator(
+  output: IntCodeGenetator,
+  input: IntCodeGenetator,
+  isCircular = false
+) {
+  let inp = yield "input";
+  do {
+    let out = output.next(inp).value;
+
+    if (out === "input") {
+      out = output.next(inp).value;
+    }
+
+    if (out === undefined) {
+      return;
+    }
+    if (typeof out !== "number") {
+      throw new Error("expected a number");
+    }
+
+    yield out;
+    do {
+      const res = output.next().value;
+      if (res === undefined) {
+        break;
+      }
+      if (res === "input") {
+        break;
+      }
+      out = res;
+      yield out;
+    } while (true);
+
+    let tout = input.next(out).value;
+    if (tout === "input") {
+      tout = input.next(out).value;
+    }
+    if (tout === undefined) {
+      return;
+    }
+    if (typeof tout !== "number") {
+      throw new Error("expected a number");
+    }
+
+    yield tout;
+    do {
+      const res = input.next().value;
+      if (res === undefined) {
+        break;
+      }
+      if (res === "input") {
+        break;
+      }
+      tout = res;
+      yield tout;
+    } while (true);
+    inp = tout;
+  } while (isCircular);
+}
+
+export async function intCodeProcessor<T extends number>(
   line: string,
   outputFn: (...args: T[]) => void,
-  getInputCb?: T | (() => T)
+  getInputCb?: T | (() => T) | (() => Promise<T>)
 ) {
   const generator = intCodeGenerator(line);
   let x: GeneratorResult;
   let input: T = Infinity as T;
-  const getInput: undefined | (() => T) =
-    getInputCb === undefined || typeof getInputCb === "function"
-      ? getInputCb
-      : () => getInputCb;
+  const getInput: undefined | (() => Promise<T>) =
+    typeof getInputCb === "function"
+      ? async () => await getInputCb()
+      : getInputCb === undefined
+      ? undefined
+      : () => Promise.resolve(getInputCb);
 
   const args = new Array<T>(outputFn.length);
   let i = 0;
@@ -135,7 +198,7 @@ export function intCodeProcessor<T extends number>(
       if (getInput === undefined) {
         throw new Error("Got asked for an input");
       }
-      input = getInput();
+      input = await getInput();
     } else {
       args[i++] = x as T;
       if (i % args.length === 0) {

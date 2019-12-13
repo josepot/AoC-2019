@@ -11,7 +11,7 @@ const solutions: ((visitedPositions: Map<string, number>) => any)[] = [
       .join("\n")
 ];
 
-export default [0, 1].map(idx => ([line]: string) => {
+export default [0, 1].map(idx => async ([line]: string) => {
   const visitedPositions = new Map<string, number>();
   const getInput = ({ x, y }: Position): number =>
     visitedPositions.get([x, y].join(",")) ?? 0;
@@ -20,7 +20,7 @@ export default [0, 1].map(idx => ([line]: string) => {
   let currentPosition = { x: 0, y: 0 };
   let initialInput = true;
 
-  intCodeProcessor(
+  await intCodeProcessor(
     line,
     (color, direction) => {
       visitedPositions.set(
