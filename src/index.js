@@ -133,12 +133,15 @@ const submit = async solution => {
   }
 };
 
-readFile(`${dayPath}/input`, "utf-8").then(
-  c(
-    submit,
-    tap(x => log(x)),
-    fn,
-    tap(() => (start = Date.now())),
-    getLines
+readFile(`${dayPath}/input`, "utf-8")
+  .then(
+    c(
+      tap(() => (start = Date.now())),
+      getLines
+    )
   )
-);
+  .then(lines => fn(lines))
+  .then(result => {
+    log(result);
+    submit(result);
+  });
