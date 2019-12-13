@@ -1,5 +1,16 @@
 const EXIT_CODE = 99;
 
+export type GeneratorReturnType<T> = T extends Generator<infer R, infer RR, any>
+  ? R | RR
+  : any;
+export type GeneratorInputType<T> = T extends Generator<any, any, infer R>
+  ? R
+  : any;
+
+export type GeneratorResult = GeneratorReturnType<
+  ReturnType<typeof intCodeGenerator>
+>;
+
 const getOperationKeyModes = (x: number) => {
   const operationKeyRaw = x.toString(10).padStart(5, "0");
   const iKey = Number(operationKeyRaw.substring(3));
@@ -52,7 +63,7 @@ export default function* intCodeGenerator(line: string) {
         break;
       }
       case 3: {
-        save(yield "input");
+        save(yield "input" as "input");
         break;
       }
       case 4: {
@@ -90,7 +101,7 @@ export default function* intCodeGenerator(line: string) {
         break;
       }
       case EXIT_CODE: {
-        return;
+        return "done" as "done";
       }
       default: {
         throw new Error(`Invalid operation with code ${iKey}`);

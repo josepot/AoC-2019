@@ -1,12 +1,16 @@
-export default function printPositionsMap<T>(
+type Mapper<T> = (
+  val: T,
+  x: number,
+  y: number,
+  originalX: number,
+  originalY: number
+) => string;
+
+type RecordMapper<T extends string | number | symbol> = Record<T, string>;
+
+export default function printPositionsMap<T extends string | number | symbol>(
   map: Map<string, T>,
-  cellMapper: (
-    val: T,
-    x: number,
-    y: number,
-    originalX: number,
-    originalY: number
-  ) => string
+  cellMapper: Mapper<T> | RecordMapper<T>
 ) {
   const limits = [...map.keys()]
     .map(x => x.split(",").map(Number) as [number, number])
@@ -22,6 +26,9 @@ export default function printPositionsMap<T>(
   const width = limits.right - limits.left + 1;
   const hight = limits.bottom - limits.top + 1;
 
+  const mapper =
+    typeof cellMapper === "function" ? cellMapper : (x: T) => cellMapper[x];
+
   return Array(hight)
     .fill(null)
     .map((_, yDelta) => yDelta + limits.top)
@@ -29,7 +36,7 @@ export default function printPositionsMap<T>(
       Array(width)
         .fill(null)
         .map((_, xDelta) => xDelta + limits.left)
-        .map((x, xx) => cellMapper(map.get([x, y].join(","))!, xx, yy, x, y))
+        .map((x, xx) => mapper(map.get([x, y].join(","))!, xx, yy, x, y))
         .join("")
     )
     .join("\n");
