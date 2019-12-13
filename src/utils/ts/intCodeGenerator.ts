@@ -148,4 +148,5 @@ export function intCodeProcessor<T extends number>(
   if (!generator.next().done) {
     throw new Error("intCodeGenerator yielded undefined");
   }
+  return args.slice(i - 1)[0];
 }
