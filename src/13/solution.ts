@@ -1,12 +1,11 @@
-import intCodeGenerator, { intCodeProcessor } from "utils/ts/intCodeGenerator";
-import nestData from "utils/ts/nestData";
+import { intCodeProcessor } from "utils/ts/intCodeGenerator";
 
 const solution1 = ([line]: string) => {
   const visitedPositions = new Map<string, number>();
 
-  nestData([...intCodeGenerator(line)], 3).forEach(([x, y, z]) => {
-    visitedPositions.set([x, y].join(","), z as number);
-  });
+  intCodeProcessor(line, (x, y, z) =>
+    visitedPositions.set([x, y].join(","), z as number)
+  );
 
   return [...visitedPositions.values()].filter(x => x === 2).length;
 };
