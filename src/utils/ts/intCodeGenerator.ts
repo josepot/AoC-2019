@@ -117,7 +117,7 @@ export default function* intCodeGenerator(line: string) {
 export function intCodeProcessor(
   line: string,
   outputFn: (...args: number[]) => void,
-  getInputCb?: () => number | number
+  getInputCb?: number | (() => number)
 ) {
   const generator = intCodeGenerator(line);
   let x: GeneratorResult;
