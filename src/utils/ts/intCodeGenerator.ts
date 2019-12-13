@@ -63,7 +63,11 @@ export default function* intCodeGenerator(line: string) {
         break;
       }
       case 3: {
-        save(yield "input" as "input");
+        const input: number | undefined = yield "input" as "input";
+        if (input === undefined) {
+          throw new Error("input can not be undefined");
+        }
+        save(input);
         break;
       }
       case 4: {
@@ -101,10 +105,42 @@ export default function* intCodeGenerator(line: string) {
         break;
       }
       case EXIT_CODE: {
-        return "done" as "done";
+        return;
       }
       default: {
         throw new Error(`Invalid operation with code ${iKey}`);
+      }
+    }
+  }
+}
+
+export function intCodeProcessor(
+  line: string,
+  outputFn: (...args: number[]) => void,
+  getInputCb?: () => number | number
+) {
+  const generator = intCodeGenerator(line);
+  let x: GeneratorResult;
+  let input: number = 0;
+  const getInput: undefined | (() => number) =
+    getInputCb === undefined || typeof getInputCb === "function"
+      ? getInputCb
+      : () => getInputCb;
+
+  const args = new Array<number>(outputFn.length);
+  let i = 0;
+
+  while ((x = generator.next(input).value) !== undefined) {
+    if (x === "input") {
+      if (getInput === undefined) {
+        throw new Error("Got asked for an input");
+      }
+      input = getInput();
+    } else {
+      args[i++] = x;
+      if (i % args.length === 0) {
+        outputFn(...args);
+        i = 0;
       }
     }
   }
