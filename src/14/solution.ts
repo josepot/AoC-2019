@@ -18,31 +18,30 @@ const getLine = (str: string) => {
 };
 
 const solution1 = (nodes: Map<string, Node>, nFuel = 1) => {
-  const have = new Map<string, number>();
-  const getPrimitivePrice = (rootKey: string, amount: number) => {
+  const pocket = new Map<string, number>();
+
+  const getPrimitivePrice = (rootKey: string, amountRequested: number) => {
+    if (!nodes.has(rootKey)) return amountRequested;
+
+    const amountNeeded = amountRequested - (pocket.get(rootKey) ?? 0);
+    if (amountNeeded < 0) return 0;
+
     let result = 0;
     const { total, requires } = nodes.get(rootKey)!;
-    const multiplier = Math.ceil(amount / total);
+    const multiplier = Math.ceil(amountNeeded / total);
 
     requires.forEach(([chidKey, childAmount]) => {
       const amountToget = multiplier * childAmount;
-      if (!nodes.has(chidKey)) {
-        result += amountToget;
-      } else {
-        if ((have.get(chidKey) ?? 0) < amountToget) {
-          result += getPrimitivePrice(
-            chidKey,
-            amountToget - (have.get(chidKey) ?? 0)
-          );
-        }
-        have.set(chidKey, (have.get(chidKey) ?? 0) - amountToget);
-      }
+      result += getPrimitivePrice(chidKey, amountToget);
+      pocket.set(chidKey, (pocket.get(chidKey) ?? 0) - amountToget);
     });
-    have.set(rootKey, (have.get(rootKey) ?? 0) + multiplier * total);
+
+    pocket.set(rootKey, (pocket.get(rootKey) ?? 0) + multiplier * total);
 
     return result;
   };
-  return getPrimitivePrice("FUEL", nFuel);
+  const result = getPrimitivePrice("FUEL", nFuel);
+  return result;
 };
 
 const solution2 = (nodes: Map<string, Node>) =>
