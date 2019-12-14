@@ -26,22 +26,19 @@ const solution1 = (nodes: Map<string, Node>, nFuel = 1) => {
     const amountNeeded = amountRequested - (pocket.get(rootKey) ?? 0);
     if (amountNeeded < 0) return 0;
 
-    let result = 0;
     const { total, requires } = nodes.get(rootKey)!;
     const multiplier = Math.ceil(amountNeeded / total);
-
-    requires.forEach(([chidKey, childAmount]) => {
-      const amountToget = multiplier * childAmount;
-      result += getPrimitivePrice(chidKey, amountToget);
-      pocket.set(chidKey, (pocket.get(chidKey) ?? 0) - amountToget);
-    });
-
     pocket.set(rootKey, (pocket.get(rootKey) ?? 0) + multiplier * total);
 
-    return result;
+    return requires.reduce((result, [chidKey, childAmount]) => {
+      const amountToRequest = multiplier * childAmount;
+      result += getPrimitivePrice(chidKey, amountToRequest);
+      pocket.set(chidKey, pocket.get(chidKey)! - amountToRequest);
+      return result;
+    }, 0);
   };
-  const result = getPrimitivePrice("FUEL", nFuel);
-  return result;
+
+  return getPrimitivePrice("FUEL", nFuel);
 };
 
 const solution2 = (nodes: Map<string, Node>) =>
