@@ -1,3 +1,5 @@
+import binarySearch from "utils/ts/binarySearch";
+
 interface Node {
   id: string;
   total: number;
@@ -43,27 +45,8 @@ const solution1 = (nodes: Map<string, Node>, nFuel = 1) => {
   return getPrimitivePrice("FUEL", nFuel);
 };
 
-const solution2 = (nodes: Map<string, Node>) => {
-  const target = 1000000000000;
-  let up = 10000000;
-  let down = 1000000;
-
-  let diff;
-  do {
-    diff = Math.round((up - down) / 2);
-    const result = solution1(nodes, down + diff);
-
-    if (result > target) {
-      up -= diff;
-    } else if (result < target) {
-      down += diff;
-    } else {
-      return down + diff;
-    }
-  } while (diff > 1);
-
-  return down;
-};
+const solution2 = (nodes: Map<string, Node>) =>
+  binarySearch(x => solution1(nodes, x) - 1000000000000, 0, 10000000, false);
 
 export default [solution1, solution2].map(fn => (lines: string[]) => {
   const nodes = new Map<string, Node>();
