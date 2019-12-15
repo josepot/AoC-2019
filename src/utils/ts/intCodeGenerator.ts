@@ -193,12 +193,17 @@ export async function intCodeProcessor<T extends number>(
   const args = new Array<T>(outputFn.length);
   let i = 0;
 
+  let isOn = true;
   while ((x = generator.next(input).value) !== undefined) {
     if (x === "input") {
       if (getInput === undefined) {
         throw new Error("Got asked for an input");
       }
       input = await getInput();
+      if (input === Infinity) {
+        isOn = false;
+        break;
+      }
     } else {
       args[i++] = x as T;
       if (i % args.length === 0) {
@@ -208,7 +213,7 @@ export async function intCodeProcessor<T extends number>(
     }
   }
 
-  if (!generator.next().done) {
+  if (isOn && !generator.next().done) {
     throw new Error("intCodeGenerator yielded undefined");
   }
   return args.slice(i - 1)[0];

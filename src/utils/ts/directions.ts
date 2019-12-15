@@ -20,6 +20,13 @@ export type NextDirection = {
   left: NextDirection;
 };
 
+export function turnWheel(wheel: NextDirection, direction: Direction) {
+  do {
+    wheel = wheel.left;
+  } while (wheel.value !== direction);
+  return wheel;
+}
+
 export function getDirectionWheel() {
   const up: NextDirection = {
     value: Direction.UP,
@@ -67,3 +74,13 @@ export const movePosition = (
     y: position.y + yDelta
   };
 };
+
+export const getAdjacentPositions = (
+  x: number,
+  y: number
+): [number, number][] => [
+  [x + 1, y],
+  [x - 1, y],
+  [x, y + 1],
+  [x, y - 1]
+];
