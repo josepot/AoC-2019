@@ -17,6 +17,51 @@ interface Node {
   value: number;
   steps: number;
 }
+
+const solution2 = (lines: string[]) => {
+  const visitedPositions = new Map<string, number>();
+  lines.forEach((line, y) =>
+    line.split("").forEach((val, x) => {
+      const value = val === "." ? 1 : 0;
+      visitedPositions.set([x, y].join(","), value);
+    })
+  );
+  visitedPositions.set([9, 1].join(","), 2);
+
+  const getNextPositions = (id: string) => {
+    const [x, y] = id.split(",").map(Number);
+    const result = [
+      [x + 1, y],
+      [x - 1, y],
+      [x, y + 1],
+      [x, y - 1]
+    ]
+      .map(([x, y]) => positionToKey({ x, y }))
+      .map(id => {
+        const value = visitedPositions.get(id)!;
+        return { id, value };
+      })
+      .filter(x => x.value === 1);
+    return result;
+  };
+
+  let minutes = 0;
+  do {
+    console.log("minute: ", minutes);
+    console.log(printPositionsMap(visitedPositions, x => ["#", ".", "o"][x]));
+    console.log("");
+    [...visitedPositions.entries()]
+      .filter(x => x[1] === 2)
+      .forEach(([id]) => {
+        getNextPositions(id).forEach(p => {
+          visitedPositions.set(p.id, 2);
+        });
+      });
+    minutes++;
+  } while ([...visitedPositions.values()].find(x => x === 1));
+  return minutes;
+};
+
 const solution1 = async ([line]: string) => {
   const visitedPositions = new Map<string, number>();
   let currentPosition = { x: 0, y: 0 };
@@ -87,5 +132,5 @@ const solution1 = async ([line]: string) => {
   return [...visitedPositions.values()].filter(x => x === 2).length;
 };
 
-export default [solution1];
+export default [solution2];
 // export default [solution1, solution2];
