@@ -1,17 +1,5 @@
-import binarySearch from "utils/ts/binarySearch";
 import { circularLinkedList } from "utils/ts/linkedLists";
 import add from "utils/ts/add";
-
-const getLine = (str: string) => {
-  const [inputsRaw, targetRaw] = str.split(" => ");
-  const inputs = inputsRaw.split(", ").map(x => {
-    const [rawNumber, key] = x.split(" ");
-    return [key, Number(rawNumber)] as [string, number];
-  });
-  const [rawNumber, key] = targetRaw.split(" ");
-  const target = [key, Number(rawNumber)] as [string, number];
-  return [inputs, target] as [Array<[string, number]>, [string, number]];
-};
 
 const solution1 = ([line]: string) => {
   const circularList = circularLinkedList([0, 1, 0, -1]);
@@ -19,21 +7,16 @@ const solution1 = ([line]: string) => {
   const calcualteNumberForIdx = (n: number[], idx: number) => {
     let [x] = circularList;
     let counter = 1;
-    const result = n
-      .map(currentNumber => {
-        if (counter++ % (idx + 1) === 0) {
-          x = x.next;
-        }
-        return currentNumber * x.value;
-      })
-      .reduce(add);
-    const res = Number(
-      result
-        .toString(10)
-        .split("")
-        .slice(-1)[0]
+    return Math.abs(
+      n
+        .map(currentNumber => {
+          if (counter++ % (idx + 1) === 0) {
+            x = x.next;
+          }
+          return currentNumber * x.value;
+        })
+        .reduce(add) % 10
     );
-    return res;
   };
 
   let numbers = line.split("").map(Number);
@@ -43,4 +26,29 @@ const solution1 = ([line]: string) => {
   return numbers.slice(0, 8).join("");
 };
 
-export default [solution1];
+const solution2 = ([line]: string) => {
+  let inputStr: string = "";
+  for (let i = 0; i < 10000; i++) {
+    inputStr += line;
+  }
+
+  const output = inputStr
+    .slice(Number(line.slice(0, 7)))
+    .split("")
+    .map(Number)
+    .reverse();
+
+  for (let phase = 0; phase < 100; phase++) {
+    for (let i = 0, prevSum = 0; i < output.length; i++) {
+      prevSum += output[i];
+      output[i] = prevSum % 10;
+    }
+  }
+
+  return output
+    .reverse()
+    .slice(0, 8)
+    .join("");
+};
+
+export default [solution1, solution2];
