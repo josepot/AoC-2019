@@ -1,12 +1,12 @@
 const { compose: c, init, split, tap, ifElse, head } = require("ramda");
 const { promisify } = require("util");
-const readline = require("readline");
 const fs = require("fs");
 const path = require("path");
 const { isObservable } = require("rxjs");
 const https = require("https");
 const qs = require("querystring");
 const getSession = require("./getSession");
+const { askQuestion, rl } = require("./utils/askQuestion");
 
 const relPath = path.resolve(__dirname);
 let start;
@@ -23,13 +23,6 @@ const getLines = c(
   ifElse(x => x.length > 1, init, head),
   split("\n")
 );
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-const askQuestion = x => new Promise(res => rl.question(x, res));
 
 const [cmdName, , day_, idx] = process.argv;
 const day = day_ || new Date().getDate();
