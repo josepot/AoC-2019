@@ -25,9 +25,9 @@ const getPixelColor = (y: number, x: number, layers: Color[][][]): Color =>
   layers.map((_, idx) => layers[idx][y][x]).find(x => x !== Color.T) || Color.T;
 
 const solution2 = (layers: Color[][][]) =>
-  layers[0].forEach((row, y) =>
-    console.log(row.map((_, x) => getPixelColor(y, x, layers)).join(""))
-  );
+  layers[0]
+    .map((row, y) => row.map((_, x) => getPixelColor(y, x, layers)).join(""))
+    .join("\n");
 
 export default [solution1, solution2].map(fn => ([line]: string[]) =>
   fn(
