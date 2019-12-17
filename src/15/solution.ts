@@ -3,6 +3,7 @@ import {
   movePosition,
   Position,
   getAdjacentPositions,
+  getPositionFromKey,
   Direction
 } from "utils/ts/directions";
 import graphDistinctSearch from "utils/ts/graphDistinctSearch";
@@ -20,7 +21,7 @@ const getMaze = async (line: string) => {
   const closedPositions = new Set<string>();
   visitedPositions.set("0,0", 1);
 
-  let currentPosition = { x: 0, y: 0 };
+  let currentPosition = { x: 0, y: 0, key: "0,0" };
   let currentDirection: Direction;
 
   const processOutput = (status: Cell) => {
@@ -32,37 +33,32 @@ const getMaze = async (line: string) => {
   };
 
   const getNextDirection = () => {
-    const unVisitedPositions = getAdjacentPositions(
-      currentPosition.x,
-      currentPosition.y
-    ).filter(([x, y]) => !visitedPositions.has([x, y].join(",")));
+    const unVisitedPositions = getAdjacentPositions(currentPosition).filter(
+      ({ key }) => !visitedPositions.has(key)
+    );
 
     let nextTarget;
     if (unVisitedPositions.length === 0) {
       closedPositions.add(positionToKey(currentPosition));
-      const openPositions = getAdjacentPositions(
-        currentPosition.x,
-        currentPosition.y
-      ).filter(([x, y]) => {
-        const key = [x, y].join(",");
-        return visitedPositions.get(key)! > 0 && !closedPositions.has(key);
-      });
+      const openPositions = getAdjacentPositions(currentPosition).filter(
+        ({ key }) => visitedPositions.get(key)! > 0 && !closedPositions.has(key)
+      );
       if (openPositions.length === 0) return Infinity;
       [nextTarget] = openPositions;
     } else {
       [nextTarget] = unVisitedPositions;
     }
 
-    const xDiff = nextTarget[0] - currentPosition.x;
-    const yDiff = nextTarget[1] - currentPosition.y;
+    const xDiff = nextTarget.x - currentPosition.x;
+    const yDiff = nextTarget.y - currentPosition.y;
     return (currentDirection =
       yDiff === 0
         ? xDiff > 0
           ? Direction.RIGHT
           : Direction.LEFT
         : yDiff > 0
-        ? Direction.UP
-        : Direction.DOWN);
+        ? Direction.DOWN
+        : Direction.UP);
   };
 
   await intCodeProcessor<number>(line, processOutput, getNextDirection);
@@ -80,12 +76,10 @@ const solution1 = (maze: Map<string, Cell>) =>
     { id: "0,0", steps: 0, value: 0 } as Node,
     (node: Node) =>
       node.value === Cell.AIR ||
-      getAdjacentPositions(
-        ...(node.id.split(",").map(Number) as [number, number])
-      )
-        .map(xy => ({
-          id: xy.join(","),
-          value: maze.get(xy.join(","))!,
+      getAdjacentPositions(getPositionFromKey(node.id))
+        .map(p => ({
+          id: p.key,
+          value: maze.get(p.key)!,
           steps: node.steps + 1
         }))
         .filter(x => x.value !== Cell.WALL),
@@ -94,9 +88,8 @@ const solution1 = (maze: Map<string, Cell>) =>
 
 const solution2 = (maze: Map<string, Cell>) => {
   const getNextPositions = (id: string) =>
-    getAdjacentPositions(...(id.split(",").map(Number) as [number, number]))
-      .map(([x, y]) => positionToKey({ x, y }))
-      .map(id => ({ id, value: maze.get(id)! }))
+    getAdjacentPositions(getPositionFromKey(id))
+      .map(({ key }) => ({ id: key, value: maze.get(key)! }))
       .filter(x => x.value === Cell.OPEN);
 
   let minutes = 0;

@@ -5,13 +5,13 @@ export enum Direction {
   RIGHT = 4
 }
 
-export type Position = { x: number; y: number };
+export type Position = { x: number; y: number; key: string };
 
-export const directionDeltas: Record<Direction, Position> = {
-  [Direction.UP]: { x: 0, y: 1 },
-  [Direction.DOWN]: { x: 0, y: -1 },
-  [Direction.LEFT]: { x: -1, y: 0 },
-  [Direction.RIGHT]: { x: 1, y: 0 }
+export const directionDeltas: Record<Direction, [number, number]> = {
+  [Direction.UP]: [0, -1],
+  [Direction.DOWN]: [0, 1],
+  [Direction.LEFT]: [-1, 0],
+  [Direction.RIGHT]: [1, 0]
 };
 
 export type NextDirection = {
@@ -68,19 +68,25 @@ export const movePosition = (
   position: Position,
   direction: Direction
 ): Position => {
-  const { x: xDelta, y: yDelta } = directionDeltas[direction];
-  return {
+  const [xDelta, yDelta] = directionDeltas[direction];
+  const res = {
     x: position.x + xDelta,
-    y: position.y + yDelta
+    y: position.y + yDelta,
+    key: ""
   };
+  res.key = res.x + "," + res.y;
+  return res;
 };
 
-export const getAdjacentPositions = (
-  x: number,
-  y: number
-): [number, number][] => [
-  [x + 1, y],
-  [x - 1, y],
-  [x, y + 1],
-  [x, y - 1]
-];
+export const getPositionFromKey = (key: string) => {
+  const [x, y] = key.split(",").map(Number);
+  return { x, y, key };
+};
+
+export const getAdjacentPositions = ({ x, y }: Position): Position[] =>
+  [
+    [x + 1, y],
+    [x - 1, y],
+    [x, y + 1],
+    [x, y - 1]
+  ].map(([x, y]) => ({ x, y, key: x + "," + y }));

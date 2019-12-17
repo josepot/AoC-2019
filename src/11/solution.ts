@@ -4,11 +4,7 @@ import printPositionsMap from "utils/ts/printPositionsMap";
 
 const solutions: ((visitedPositions: Map<string, number>) => any)[] = [
   map => map.size,
-  map =>
-    printPositionsMap(map, x => (x ? "#" : " "))
-      .split("\n")
-      .reverse()
-      .join("\n")
+  map => printPositionsMap(map, x => (x ? "#" : " "))
 ];
 
 export default [0, 1].map(idx => async ([line]: string) => {
@@ -17,7 +13,7 @@ export default [0, 1].map(idx => async ([line]: string) => {
     visitedPositions.get([x, y].join(",")) ?? 0;
 
   let wheel = getDirectionWheel();
-  let currentPosition = { x: 0, y: 0 };
+  let currentPosition = { x: 0, y: 0, key: "0,0" };
   let initialInput = true;
 
   await intCodeProcessor(
