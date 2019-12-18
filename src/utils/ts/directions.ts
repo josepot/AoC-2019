@@ -90,3 +90,11 @@ export const getAdjacentPositions = ({ x, y }: Position): Position[] =>
     [x, y + 1],
     [x, y - 1]
   ].map(([x, y]) => ({ x, y, key: x + "," + y }));
+
+export const getDiagonalPositions = ({ x, y }: Position): Position[] =>
+  [
+    [x + 1, y + 1],
+    [x + 1, y - 1],
+    [x - 1, y + 1],
+    [x - 1, y - 1]
+  ].map(([x, y]) => ({ x, y, key: x + "," + y }));
