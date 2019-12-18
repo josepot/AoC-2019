@@ -9,13 +9,17 @@ import graphDistinctSearch from "utils/ts/graphDistinctSearch";
 
 const solution1 = (lines: string[]) => {
   const positions = new Map<string, string>();
+  let initialPosition: Position;
   lines.forEach((line, y) =>
     line.split("").forEach((value, x) => {
-      positions.set(`${x},${y}`, value);
+      const key = `${x},${y}`;
+      positions.set(key, value);
+      if (value === "@") {
+        initialPosition = getPositionFromKey(key);
+        positions.set(key, ".");
+      }
     })
   );
-
-  positions.set("40,40", ".");
 
   const getNextKeysAtReach = (
     currentPosition: Position,
@@ -64,38 +68,35 @@ const solution1 = (lines: string[]) => {
     return distances;
   };
 
+  const previous = new Map<string, number>();
+
   const getSolution = (
     currentPosition: Position,
-    solution: { takenPaths: [string, number, string][]; distance: number }
-  ): { takenPaths: [string, number, string][]; distance: number } => {
-    console.log(
-      solution.takenPaths.map(x => x[0]),
-      solution.distance
-    );
-    const nextAvailableKeys = getNextKeysAtReach(
-      currentPosition,
-      new Set(solution.takenPaths.map(([key]) => key))
-    );
-    if (nextAvailableKeys.size === 0) return solution;
+    keys: Set<string>
+  ): number => {
+    const currentKey = [currentPosition.key, ...[...keys].sort()].join(",");
+    if (previous.has(currentKey)) {
+      return previous.get(currentKey)!;
+    }
 
-    const nextKeys = [...nextAvailableKeys.entries()]
-      .sort((a, b) => a[1][0] - b[1][0])
-      .filter((_, idx) => idx < 1);
-    const solutions = nextKeys.map(([value, [distance, id]]) =>
-      getSolution(getPositionFromKey(id), {
-        takenPaths: [...solution.takenPaths, [value, distance, id]],
-        distance: solution.distance + distance
-      })
-    );
+    const nextKeys = getNextKeysAtReach(currentPosition, keys);
+    if (nextKeys.size === 0) {
+      previous.set(currentKey, 0);
+      return 0;
+    }
 
-    return solutions.sort(
-      (aSolution, bSolution) => aSolution.distance - bSolution.distance
-    )[0];
+    const result = Math.min(
+      ...[...nextKeys.entries()].map(
+        ([key, [distance, positionId]]) =>
+          distance +
+          getSolution(getPositionFromKey(positionId), new Set([...keys, key]))
+      )
+    );
+    previous.set(currentKey, result);
+    return result;
   };
 
-  let currentPosition: Position = { x: 40, y: 40, key: "40,40" };
-  const winner = getSolution(currentPosition, { distance: 0, takenPaths: [] });
-  return winner.distance;
+  return getSolution(initialPosition!, new Set());
 };
 
 export default [solution1];
