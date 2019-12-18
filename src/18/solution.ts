@@ -1,5 +1,3 @@
-import { circularLinkedList } from "utils/ts/linkedLists";
-import add from "utils/ts/add";
 import {
   Position,
   getAdjacentPositions,
@@ -52,10 +50,7 @@ const solution1 = (lines: string[]) => {
               if (value === ".") return true;
               if (value === "#") return false;
               if (value?.toLowerCase() === value) return true;
-              if (collectedKeys.has(value!.toLowerCase())) {
-                return true;
-              }
-              return false;
+              return collectedKeys.has(value!.toLowerCase());
             })
             .map(x => ({
               id: x.key,
@@ -75,25 +70,22 @@ const solution1 = (lines: string[]) => {
     keys: Set<string>
   ): number => {
     const currentKey = [currentPosition.key, ...[...keys].sort()].join(",");
-    if (previous.has(currentKey)) {
-      return previous.get(currentKey)!;
-    }
+    if (previous.has(currentKey)) return previous.get(currentKey)!;
 
     const nextKeys = getNextKeysAtReach(currentPosition, keys);
-    if (nextKeys.size === 0) {
-      previous.set(currentKey, 0);
-      return 0;
-    }
+    if (nextKeys.size === 0) return 0;
 
-    const result = Math.min(
-      ...[...nextKeys.entries()].map(
-        ([key, [distance, positionId]]) =>
-          distance +
-          getSolution(getPositionFromKey(positionId), new Set([...keys, key]))
+    previous.set(
+      currentKey,
+      Math.min(
+        ...[...nextKeys.entries()].map(
+          ([key, [distance, positionId]]) =>
+            distance +
+            getSolution(getPositionFromKey(positionId), new Set([...keys, key]))
+        )
       )
     );
-    previous.set(currentKey, result);
-    return result;
+    return previous.get(currentKey)!;
   };
 
   return getSolution(initialPosition!, new Set());
