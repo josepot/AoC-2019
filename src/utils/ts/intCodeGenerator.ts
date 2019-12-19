@@ -175,20 +175,26 @@ export function* plugGenerator(
   } while (isCircular);
 }
 
-export async function intCodeProcessor<T extends number>(
+export function intCodeProcessor<T extends number>(
   line: string,
   outputFn: (...args: T[]) => void,
-  getInputCb?: T | (() => T) | (() => Promise<T>)
+  getInputCb?: T | (() => T) | Iterable<T>
 ) {
   const generator = intCodeGenerator(line);
   let x: GeneratorResult;
   let input: T = Infinity as T;
-  const getInput: undefined | (() => Promise<T>) =
+  const getInput: undefined | (() => T) =
     typeof getInputCb === "function"
-      ? async () => await getInputCb()
+      ? getInputCb
       : getInputCb === undefined
       ? undefined
-      : () => Promise.resolve(getInputCb);
+      : typeof (getInputCb as any)[Symbol.iterator] === "function"
+      ? (() => {
+          let i = 0;
+          const arr = [...(getInputCb as Iterable<T>)];
+          return () => arr[i++];
+        })()
+      : () => getInputCb as T;
 
   const args = new Array<T>(outputFn.length);
   let i = 0;
@@ -199,7 +205,7 @@ export async function intCodeProcessor<T extends number>(
       if (getInput === undefined) {
         throw new Error("Got asked for an input");
       }
-      input = await getInput();
+      input = getInput();
       if (input === Infinity) {
         isOn = false;
         break;

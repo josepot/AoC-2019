@@ -7,7 +7,7 @@ const solutions: ((visitedPositions: Map<string, number>) => any)[] = [
   map => printPositionsMap(map, x => (x ? "#" : " "))
 ];
 
-export default [0, 1].map(idx => async ([line]: string) => {
+export default [0, 1].map(idx => ([line]: string) => {
   const visitedPositions = new Map<string, number>();
   const getInput = ({ x, y }: Position): number =>
     visitedPositions.get([x, y].join(",")) ?? 0;
@@ -16,7 +16,7 @@ export default [0, 1].map(idx => async ([line]: string) => {
   let currentPosition = { x: 0, y: 0, key: "0,0" };
   let initialInput = true;
 
-  await intCodeProcessor(
+  intCodeProcessor(
     line,
     (color, direction) => {
       visitedPositions.set(

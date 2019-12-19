@@ -23,8 +23,8 @@ const buildGtrid = (c: number) => {
   currentX++;
 };
 
-const solution1 = async ([line]: string[]) => {
-  await intCodeProcessor(line, buildGtrid);
+const solution1 = ([line]: string[]) => {
+  intCodeProcessor(line, buildGtrid);
   return [...positions.entries()]
     .filter(([, val]) => val === PATH_CODE)
     .map(([key]) => getPositionFromKey(key))
@@ -136,7 +136,7 @@ const getMainSequence = (path: string, sequences: string[]) => {
   return result.map(x => String.fromCharCode(65 + x)).join(",");
 };
 
-const solution2 = async ([line]: string[]) => {
+const solution2 = ([line]: string[]) => {
   let solution: number[];
   const getSolution = () => {
     if (solution !== undefined) return solution;

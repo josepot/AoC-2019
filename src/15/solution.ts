@@ -16,7 +16,7 @@ enum Cell {
 
 const positionToKey = (x: Position) => x.x + "," + x.y;
 
-const getMaze = async (line: string) => {
+const getMaze = (line: string) => {
   const visitedPositions = new Map<string, Cell>();
   const closedPositions = new Set<string>();
   visitedPositions.set("0,0", 1);
@@ -61,7 +61,7 @@ const getMaze = async (line: string) => {
         : Direction.UP);
   };
 
-  await intCodeProcessor<number>(line, processOutput, getNextDirection);
+  intCodeProcessor<number>(line, processOutput, getNextDirection);
   return visitedPositions;
 };
 
@@ -105,5 +105,5 @@ const solution2 = (maze: Map<string, Cell>) => {
 };
 
 export default [solution1, solution2].map(fn => ([line]: string) =>
-  getMaze(line).then(fn)
+  fn(getMaze(line))
 );

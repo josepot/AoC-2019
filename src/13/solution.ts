@@ -1,19 +1,19 @@
 import { intCodeProcessor } from "utils/ts/intCodeGenerator";
 
-const solution1 = async ([line]: string) => {
+const solution1 = ([line]: string) => {
   const visitedPositions = new Map<string, number>();
 
-  await intCodeProcessor(line, (x, y, z) =>
+  intCodeProcessor(line, (x, y, z) =>
     visitedPositions.set([x, y].join(","), z)
   );
 
   return [...visitedPositions.values()].filter(x => x === 2).length;
 };
 
-const solution2 = async ([line]: string) => {
+const solution2 = ([line]: string) => {
   let [score, ballX, myX] = [0, 0, 0];
 
-  await intCodeProcessor<number>(
+  intCodeProcessor<number>(
     "2" + line.slice(1),
     (x, y, z) => {
       if (x === -1 && y === 0) {
