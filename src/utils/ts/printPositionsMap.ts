@@ -21,7 +21,7 @@ export default function printPositionsMap<T extends string | number | symbol>(
         top: Math.min(acc.top, y),
         bottom: Math.max(acc.bottom, y)
       }),
-      { left: 0, right: 0, top: 0, bottom: 0 }
+      { left: Infinity, right: 0, top: Infinity, bottom: 0 }
     );
   const width = limits.right - limits.left + 1;
   const hight = limits.bottom - limits.top + 1;
