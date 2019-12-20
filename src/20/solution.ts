@@ -10,7 +10,7 @@ import printPositionsMap from "utils/ts/printPositionsMap";
 const solution1 = (lines: string[]) => {
   const positions = new Map<string, string>();
   const portalEntries = new Map<string, string>();
-  const portalExits = new Map<string, string>();
+  const portalExits = new Map<string, [string, string]>();
 
   lines.forEach((line, y) =>
     line.split("").forEach((value, x) => {
@@ -30,17 +30,26 @@ const solution1 = (lines: string[]) => {
       let spacesAround = getAdjacentPositions(getPositionFromKey(posId))
         .map(x => [x.key, positions.get(x.key)])
         .filter(([_, val]) => val === ".");
-      const portalKey = spacesAround.length > 0 ? val + valB : valB + val;
+
+      const portalId = [val, valB].sort().join("");
+
       const start = spacesAround.length > 0 ? posId : posIdB;
+      portalEntries.set(start!, portalId);
+
       if (spacesAround.length === 0) {
         spacesAround = getAdjacentPositions(getPositionFromKey(posIdB!))
           .map(x => [x.key, positions.get(x.key)])
           .filter(([_, val]) => val === ".");
       }
-      portalEntries.set(start!, portalKey);
-      portalExits.set(portalKey, spacesAround[0]![0]!);
+      const exit = spacesAround[0]![0]!;
+      if (portalExits.has(portalId)) {
+        portalExits.get(portalId)![1] = exit;
+      } else {
+        portalExits.set(portalId, [exit, exit]);
+      }
     }
   });
+
   const startPosition = getPositionFromKey("124,63");
 
   const visited = new Map([...positions.entries()]);
@@ -60,13 +69,15 @@ const solution1 = (lines: string[]) => {
       .filter(([, val]) => isLetter(val))
       .map(
         ([posKey]) =>
-          portalExits.get(
-            portalEntries
-              .get(posKey!)!
-              .split("")
-              .reverse()
-              .join("")
-          )!
+          portalExits
+            .get(
+              portalEntries
+                .get(posKey!)!
+                .split("")
+                .sort()
+                .join("")
+            )!
+            .filter(x => x !== currentPos.key)[0]
       );
 
     const result = [...normalPositions, ...portalPositions].filter(
@@ -93,6 +104,7 @@ const solution1 = (lines: string[]) => {
       (a, b) => b.steps - a.steps
     ).steps;
   } catch (e) {
+    console.log("");
     console.log(printPositionsMap(visited, (x: string) => x));
   }
 };
