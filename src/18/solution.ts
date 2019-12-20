@@ -13,25 +13,23 @@ const solution = (positions: Map<string, string>) => {
 
   initialPositions.forEach(x => positions.set(x.key, "."));
 
-  const getData = (currentPosition: Position) => {
+  const getKeysDataFromPos = (currentPosition: Position) => {
     interface Metadata {
       id: string;
       distance: number;
       keysFound: string[];
       keysRequired: string[];
     }
-    const initialNode: Metadata = {
-      id: currentPosition.key,
-      distance: 0,
-      keysFound: [],
-      keysRequired: []
-    };
-
     const result = new Map<string, Metadata>();
     try {
       graphDistinctSearch(
-        initialNode,
-        node => {
+        {
+          id: currentPosition.key,
+          distance: 0,
+          keysFound: [],
+          keysRequired: []
+        },
+        (node: Metadata) => {
           const value = positions.get(node.id)!;
           let { keysFound, keysRequired } = node;
 
@@ -59,59 +57,57 @@ const solution = (positions: Map<string, string>) => {
     return result;
   };
 
-  const fromStart = initialPositions.map(x => getData(x));
-  const keysGraph = new Map<string, ReturnType<typeof getData>>();
+  const fromStart = initialPositions.map(x => getKeysDataFromPos(x));
+  const keysGraph = new Map<string, ReturnType<typeof getKeysDataFromPos>>();
   fromStart.forEach((x, idx) => {
     keysGraph.set(idx.toString(10), x);
     [...x.keys()].forEach(key =>
-      keysGraph.set(key, getData(getPositionFromKey(x.get(key)!.id)))
+      keysGraph.set(key, getKeysDataFromPos(getPositionFromKey(x.get(key)!.id)))
     );
   });
 
-  const getNextKeysAtReach = (
-    currentKey: string,
-    keys: Set<string>
-  ): { key: string; distance: number; keysFound: string[] }[] => {
-    return [...keysGraph.get(currentKey)!.entries()]
+  const getNextKeysAtReach = (currentKey: string, keys: Set<string>) =>
+    [...keysGraph.get(currentKey)!.entries()]
       .filter(
         ([x, { keysRequired }]) =>
           !keys.has(x) && keysRequired.every(k => keys.has(k))
       )
       .map(([key, { distance, keysFound }]) => ({ key, distance, keysFound }));
-  };
 
-  const cache = new Map<string, number>();
-
-  const getSolution = (current: string[], keys: Set<string>): number => {
+  function getSolution(
+    current: string[],
+    keys: Set<string>,
+    cache: Map<string, number>
+  ) {
     const cacheKey = [...current, ...[...keys].sort()].join(",");
     if (cache.has(cacheKey)) return cache.get(cacheKey)!;
 
     const nextKeysByRobot = current.map(x => getNextKeysAtReach(x, keys));
-
     if (nextKeysByRobot.every(x => x.length === 0)) return 0;
 
-    cache.set(
-      cacheKey,
-      Math.min(
-        ...nextKeysByRobot
-          .map((nextKeys, robotIdx) =>
-            [...nextKeys].map(
-              ({ key, distance, keysFound }) =>
-                distance +
-                getSolution(
-                  current.map((x, idx) => (idx === robotIdx ? key : x)),
-                  new Set([...keys, key, ...keysFound])
-                )
-            )
+    const result = Math.min(
+      ...nextKeysByRobot
+        .map((nextKeys, robotIdx) =>
+          [...nextKeys].map(
+            ({ key, distance, keysFound }) =>
+              distance +
+              getSolution(
+                current.map((x, idx) => (idx === robotIdx ? key : x)),
+                new Set([...keys, key, ...keysFound]),
+                cache
+              )
           )
-          .flat()
-      )
+        )
+        .flat()
     );
-    return cache.get(cacheKey)!;
-  };
+    cache.set(cacheKey, result);
+    return result;
+  }
+
   return getSolution(
     fromStart.map((_, idx) => idx.toString()),
-    new Set()
+    new Set(),
+    new Map()
   );
 };
 
@@ -121,9 +117,11 @@ const solution2 = (positions: Map<string, string>) => {
   const [initialPosition] = [...positions.entries()]
     .filter(([, val]) => val === "@")
     .map(([key]) => getPositionFromKey(key));
+
   positions.set(initialPosition.key, "#");
   getAdjacentPositions(initialPosition).forEach(x => positions.set(x.key, "#"));
   getDiagonalPositions(initialPosition).forEach(x => positions.set(x.key, "@"));
+
   return solution(positions);
 };
 
