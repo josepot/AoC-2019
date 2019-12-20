@@ -105,15 +105,15 @@ const solution1 = (lines: string[]) => {
 
 const getIsInner = (key: string): boolean => {
   const position = getPositionFromKey(key);
-  const xDiff = Math.abs(position.x - 64);
-  const yDiff = Math.abs(position.y - 61);
-  return xDiff < 33 && yDiff < 32;
+  return (
+    position.y > 34 && position.y < 89 && position.x > 34 && position.x < 92
+  );
 };
 
 const solution2 = (lines: string[]) => {
   const positions = new Map<string, string>();
   const portalEntries = new Map<string, [string, boolean]>();
-  const portalExits = new Map<string, [string, string]>();
+  const portalExits = new Map<string, Set<string>>();
 
   lines.forEach((line, y) =>
     line.split("").forEach((value, x) => {
@@ -135,7 +135,6 @@ const solution2 = (lines: string[]) => {
         .filter(([_, val]) => val === ".");
 
       const portalId = [val, valB].sort().join("");
-
       const start = spacesAround.length > 0 ? posId : posIdB;
       portalEntries.set(start!, [portalId, getIsInner(start!)]);
 
@@ -145,13 +144,18 @@ const solution2 = (lines: string[]) => {
           .filter(([_, val]) => val === ".");
       }
       const exit = spacesAround[0]![0]!;
-      if (portalExits.has(portalId)) {
-        portalExits.get(portalId)![1] = exit;
-      } else {
-        portalExits.set(portalId, [exit, exit]);
+      if (!portalExits.has(portalId)) {
+        portalExits.set(portalId, new Set());
       }
+      portalExits.get(portalId)!.add(exit);
     }
   });
+  /*
+  [...portalExits.entries()].forEach(([key, val]) =>
+    console.log(key, [...val])
+  );
+  return;
+   */
 
   const startPosition = getPositionFromKey("124,63");
 
@@ -159,13 +163,17 @@ const solution2 = (lines: string[]) => {
 
   let count = 0;
   const getAdjacentPositionsWithPortals = (
-    key: string,
+    currentPos: Position,
     level: number
   ): [string, number][] => {
-    if (count++ % 100000 === 0) {
+    /*
+    if (count++ % 10000 === 0) {
       console.log(printPositionsMap(visited, (x: string) => x));
+      if (count === 1000001) {
+        return [["69,2", 0]];
+      }
     }
-    const currentPos = getPositionFromKey(key);
+     */
     const adjacent = getAdjacentPositions(currentPos).map(x => [
       x.key,
       positions.get(x.key)
@@ -179,11 +187,16 @@ const solution2 = (lines: string[]) => {
       .filter(([, val]) => isLetter(val))
       .map(([posKey]) => {
         const [portalId, isInner] = portalEntries.get(posKey!)!;
-        const [exit] = portalExits
-          .get(portalId)!
-          .filter(x => x !== currentPos.key);
-        const nextLevel = isInner ? level + 1 : level - 1;
-        return [exit!, nextLevel] as const;
+        let [exit] = [...portalExits.get(portalId)!].filter(
+          x => x !== currentPos.key
+        );
+
+        if (exit === undefined) {
+          return ["", -1];
+        }
+
+        const nextLevel = level + (isInner ? 1 : -1);
+        return [exit, nextLevel] as const;
       })
       .filter(([, nextLevel]) => nextLevel > -1) as [string, number][];
 
@@ -197,6 +210,7 @@ const solution2 = (lines: string[]) => {
 
   const initialNode = {
     id: `${startPosition.key},0`,
+    position: startPosition,
     level: 0,
     steps: 0
   };
@@ -206,9 +220,10 @@ const solution2 = (lines: string[]) => {
       initialNode,
       current =>
         current.id === "69,2,0" ||
-        getAdjacentPositionsWithPortals(current.id, current.level).map(
+        getAdjacentPositionsWithPortals(current.position, current.level).map(
           ([posId, level]) => ({
             id: `${posId},${level}`,
+            position: getPositionFromKey(posId),
             level,
             steps: current.steps + 1
           })
@@ -216,7 +231,7 @@ const solution2 = (lines: string[]) => {
       (a, b) => b.steps - a.steps
     ).steps;
   } catch (e) {
-    console.log("");
+    console.log(e);
     console.log(printPositionsMap(visited, (x: string) => x));
   }
 };
