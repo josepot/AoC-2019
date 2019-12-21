@@ -47,7 +47,9 @@ previous && !(!e || !f || !g) || h
 previous && e && f && g || h
 
 CORRECT!
-previous && (E || H)
+previous && !(!e && !h)
+
+previous && (e || e)
 */
 
 export default [aInstructions, bInstructions].map(
