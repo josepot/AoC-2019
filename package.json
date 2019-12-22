@@ -10,6 +10,7 @@
   "author": "Josep M Sobrepere",
   "license": "MIT",
   "dependencies": {
+    "big-integer": "^1.6.48",
     "id-permutations": "^1.0.3",
     "immutable": "^4.0.0-rc.12",
     "md5": "^2.2.1",
