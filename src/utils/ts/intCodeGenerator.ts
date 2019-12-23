@@ -179,7 +179,8 @@ export function intCodeProcessors<T extends number>(
   line: string,
   nProcessors: number,
   outputFn: (idx: number, ...args: T[]) => void,
-  getInput: (idx: number) => T
+  getInputs: (idx: number) => T[] | undefined,
+  postProcess?: () => void
 ) {
   const generators = Array(nProcessors)
     .fill(null)
@@ -187,7 +188,6 @@ export function intCodeProcessors<T extends number>(
   const statusses = generators.map(() => true);
   const generatorLatestResults = generators.map(g => g.next());
 
-  let input: T = Infinity as T;
   const args = new Array<T>(outputFn.length - 1);
 
   do {
@@ -198,11 +198,13 @@ export function intCodeProcessors<T extends number>(
         return;
       }
       if (res.value === "input") {
-        input = getInput(idx);
-        if (input === Infinity) {
+        const inputs = getInputs(idx);
+        if (inputs === undefined) {
           statusses[idx] = false;
         } else {
-          generatorLatestResults[idx] = generator.next(input);
+          inputs.forEach(input => {
+            generatorLatestResults[idx] = generator.next(input);
+          });
         }
       } else {
         for (let i = 0; i < args.length; i++) {
@@ -213,6 +215,7 @@ export function intCodeProcessors<T extends number>(
         generatorLatestResults[idx] = res;
       }
     });
+    postProcess && postProcess();
   } while (statusses.some(Boolean));
 }
 

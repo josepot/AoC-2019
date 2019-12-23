@@ -1,11 +1,11 @@
 import { intCodeProcessors } from "utils/ts/intCodeGenerator";
-import Queue from "utils/ts/Queue";
 
+const emptyResult = [-1];
 const solution1 = ([line]: string[]) => {
   let result: number | undefined = undefined;
   const inputs = Array(50)
     .fill(null)
-    .map((_, idx) => new Queue<number>(idx));
+    .map((_, idx) => [idx] as number[]);
 
   intCodeProcessors(
     line,
@@ -16,7 +16,11 @@ const solution1 = ([line]: string[]) => {
       }
       inputs[address].push(x, y);
     },
-    idx => (result !== undefined ? Infinity : inputs[idx].pop() ?? -1)
+    idx => {
+      if (result) return undefined;
+      const res = inputs[idx].splice(0, 2);
+      return res.length === 0 ? emptyResult : res;
+    }
   );
   return result;
 };
@@ -24,7 +28,7 @@ const solution1 = ([line]: string[]) => {
 const solution2 = ([line]: string[]) => {
   const inputs = Array(50)
     .fill(null)
-    .map((_, idx) => new Queue<number>(idx));
+    .map((_, idx) => [idx] as number[]);
   let natPacket: [number, number] | undefined = undefined;
   let lastYDeliveredByNat: number | undefined = undefined;
 
@@ -35,31 +39,29 @@ const solution2 = ([line]: string[]) => {
     50,
     (_, address, x, y) => {
       if (address === 255) {
-        return (natPacket = [x, y]);
+        natPacket = [x, y];
+      } else {
+        inputs[address].push(x, y);
       }
-      inputs[address].push(x, y);
     },
     idx => {
-      if (result) return Infinity;
-      const out = inputs[idx].pop() ?? -1;
-      if (
-        idx === 0 &&
-        out === -1 &&
-        natPacket &&
-        inputs.every(i => i.peek() === undefined)
-      ) {
+      if (result) return undefined;
+      const res = inputs[idx].splice(0, 2);
+      return res.length === 0 ? emptyResult : res;
+    },
+    () => {
+      if (natPacket && inputs.every(i => i.length === 0)) {
         idleCounter++;
       }
       if (idleCounter > 5 && natPacket) {
         idleCounter = 0;
         if (lastYDeliveredByNat === natPacket[1]) {
           result = lastYDeliveredByNat;
-          return Infinity;
+        } else {
+          lastYDeliveredByNat = natPacket[1];
+          inputs[0].push(...natPacket);
         }
-        lastYDeliveredByNat = natPacket[1];
-        inputs[0].push(...natPacket);
       }
-      return out;
     }
   );
   return result;
