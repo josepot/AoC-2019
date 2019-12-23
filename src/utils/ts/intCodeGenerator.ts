@@ -175,6 +175,47 @@ export function* plugGenerator(
   } while (isCircular);
 }
 
+export function intCodeProcessors<T extends number>(
+  line: string,
+  nProcessors: number,
+  outputFn: (idx: number, ...args: T[]) => void,
+  getInput: (idx: number) => T
+) {
+  const generators = Array(nProcessors)
+    .fill(null)
+    .map(() => intCodeGenerator(line));
+  const statusses = generators.map(() => true);
+  const generatorLatestResults = generators.map(g => g.next());
+
+  let input: T = Infinity as T;
+  const args = new Array<T>(outputFn.length - 1);
+
+  do {
+    generators.forEach((generator, idx) => {
+      let res = generatorLatestResults[idx];
+      if (res.done) {
+        statusses[idx] = false;
+        return;
+      }
+      if (res.value === "input") {
+        input = getInput(idx);
+        if (input === Infinity) {
+          statusses[idx] = false;
+        } else {
+          generatorLatestResults[idx] = generator.next(input);
+        }
+      } else {
+        for (let i = 0; i < args.length; i++) {
+          args[i] = res.value as T;
+          res = generator.next();
+        }
+        outputFn(idx, ...args);
+        generatorLatestResults[idx] = res;
+      }
+    });
+  } while (statusses.some(Boolean));
+}
+
 export function intCodeProcessor<T extends number>(
   line: string,
   outputFn: (...args: T[]) => void,
