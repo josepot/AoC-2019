@@ -193,7 +193,7 @@ export function intCodeProcessors<T extends number>(
   do {
     generators.forEach((generator, idx) => {
       let res = generatorLatestResults[idx];
-      if (res.done) {
+      if (res.done || !statusses[idx]) {
         statusses[idx] = false;
         return;
       }
