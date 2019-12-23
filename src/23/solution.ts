@@ -34,12 +34,17 @@ const solution1 = ([line]: string[]) => {
     generatorLatestResults[idx] = g.next(idx);
   });
 
-  let result: number | undefined;
+  let natPacket: [number, number] | undefined = undefined;
+  let lastYDeliveredByNat: number | undefined = undefined;
 
-  while (result === undefined) {
+  let nTimesIddle = 0;
+  while (true) {
     generators.forEach((g, idx) => {
       let res = generatorLatestResults[idx];
-      if (res.done) return;
+      if (res.done) {
+        console.log("something finished", idx);
+        return;
+      }
       while (res.value === "input" && indexes[idx] < inputs[idx].length) {
         res = g.next(inputs[idx][indexes[idx]++]);
       }
@@ -49,20 +54,38 @@ const solution1 = ([line]: string[]) => {
         return;
       }
 
-      if (res.done) return;
+      if (res.done) {
+        console.log("something finished", idx);
+        return;
+      }
 
       const address = res.value as number;
       const x = g.next().value as number;
       const y = g.next().value as number;
       if (address === 255) {
-        return (result = y);
+        natPacket = [x, y];
+      } else {
+        inputs[address].push(x, y);
       }
-      inputs[address].push(x, y);
       generatorLatestResults[idx] = g.next();
     });
-  }
 
-  return result;
+    if (inputs.every((input, idx) => input.length === indexes[idx])) {
+      nTimesIddle++;
+    } else {
+      nTimesIddle = 0;
+    }
+
+    if (nTimesIddle > 100 && natPacket !== undefined) {
+      nTimesIddle = 0;
+      console.log("nat is delivering stuff", natPacket);
+      if (lastYDeliveredByNat === natPacket[1]) {
+        return natPacket[1];
+      }
+      lastYDeliveredByNat = natPacket[1];
+      inputs[0].push(natPacket[0], natPacket[1]);
+    }
+  }
 
   /*
   const computers = Array(50)
