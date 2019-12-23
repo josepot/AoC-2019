@@ -48,7 +48,7 @@ const solution1 = (lines: string[]) => {
     }
   });
 
-  return cards[2020];
+  return cards.indexOf(2019);
 };
 
 const solution2 = (lines: string[]) => {
