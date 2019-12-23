@@ -20,15 +20,15 @@
   },
   "devDependencies": {
     "@types/priorityqueuejs": "^1.0.1",
-    "@typescript-eslint/eslint-plugin": "^2.9.0",
-    "@typescript-eslint/parser": "^2.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.12.0",
+    "@typescript-eslint/parser": "^2.12.0",
     "cross-env": "^6.0.3",
-    "eslint": "^6.7.1",
+    "eslint": "^6.8.0",
     "husky": "^3.1.0",
-    "lint-staged": "^9.4.3",
+    "lint-staged": "^9.5.0",
     "prettier": "^1.13.7",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.4"
   },
   "husky": {
     "hooks": {
