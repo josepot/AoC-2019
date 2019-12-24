@@ -95,7 +95,7 @@ const solution2 = (lines: string[]) => {
         }
         return [level, x, y];
       })
-      .filter(([, x, y]) => x === 2 && y === 2) as [number, number, number][];
+      .filter(([, x, y]) => x !== 2 || y !== 2) as [number, number, number][];
 
     if (x === 2 && y === 1) {
       for (let xx = 0; xx < 5; xx++) {
