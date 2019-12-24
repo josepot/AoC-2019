@@ -1,30 +1,14 @@
-import {
-  Position,
-  getAdjacentPositions,
-  getPositionFromKey
-} from "utils/ts/directions";
-import graphDistinctSearch from "utils/ts/graphDistinctSearch";
+import { getAdjacentPositions, getPositionFromKey } from "utils/ts/directions";
 import add from "utils/ts/add";
-
-const isLetter = (val: string | undefined) =>
-  !!val && val.charCodeAt(0) > 64 && val.charCodeAt(0) < 91;
 
 const getNextPosition = (current: Map<string, boolean>) => {
   return new Map<string, boolean>(
     [...current.entries()].map(([key, val]) => {
-      let nextVal = val;
-      if (val) {
-        nextVal =
-          getAdjacentPositions(getPositionFromKey(key))
-            .map(x => current.get(x.key))
-            .filter(Boolean).length === 1;
-      } else {
-        const nBugs = getAdjacentPositions(getPositionFromKey(key))
-          .map(x => current.get(x.key))
-          .filter(Boolean).length;
-        nextVal = nBugs === 1 || nBugs === 2;
-      }
-      return [key, nextVal];
+      const nBugs = getAdjacentPositions(getPositionFromKey(key))
+        .map(x => current.get(x.key))
+        .filter(Boolean).length;
+
+      return [key, nBugs === 1 || (!val && nBugs === 2)];
     })
   );
 };
@@ -82,20 +66,18 @@ const solution2 = (lines: string[]) => {
       [level, x - 1, y],
       [level, x, y + 1],
       [level, x, y - 1]
-    ]
-      .map(([level, x, y]) => {
-        if (x < 0) {
-          return [level + 1, 1, 2];
-        } else if (x > 4) {
-          return [level + 1, 3, 2];
-        } else if (y < 0) {
-          return [level + 1, 2, 1];
-        } else if (y > 4) {
-          return [level + 1, 2, 3];
-        }
-        return [level, x, y];
-      })
-      .filter(([, x, y]) => x !== 2 || y !== 2) as [number, number, number][];
+    ].map(([level, x, y]) => {
+      if (x < 0) {
+        return [level + 1, 1, 2];
+      } else if (x > 4) {
+        return [level + 1, 3, 2];
+      } else if (y < 0) {
+        return [level + 1, 2, 1];
+      } else if (y > 4) {
+        return [level + 1, 2, 3];
+      }
+      return [level, x, y];
+    });
 
     if (x === 2 && y === 1) {
       for (let xx = 0; xx < 5; xx++) {
@@ -122,19 +104,11 @@ const solution2 = (lines: string[]) => {
     val: boolean,
     current: Map<string, boolean>
   ) => {
-    let nextVal = val;
-    if (val) {
-      nextVal =
-        getRecurrentAdjacentPositions(key)
-          .map(x => current.get(x))
-          .filter(Boolean).length === 1;
-    } else {
-      const nBugs = getRecurrentAdjacentPositions(key)
-        .map(x => current.get(x))
-        .filter(Boolean).length;
-      nextVal = nBugs === 1 || nBugs === 2;
-    }
-    return nextVal;
+    const nBugs = getRecurrentAdjacentPositions(key)
+      .map(x => current.get(x))
+      .filter(Boolean).length;
+
+    return nBugs === 1 || (!val && nBugs === 2);
   };
 
   const getNextRecursivePositions = (positions: Map<string, boolean>) =>
@@ -149,7 +123,7 @@ const solution2 = (lines: string[]) => {
     positions = getNextRecursivePositions(positions);
   }
 
-  return [...positions.values()].map(x => (x ? 1 : 0) as number).reduce(add);
+  return [...positions.values()].filter(Boolean).length;
 };
 
 export default [solution1, solution2];
