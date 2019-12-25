@@ -10,7 +10,8 @@ type RecordMapper<T extends string | number | symbol> = Record<T, string>;
 
 export default function printPositionsMap<T extends string | number | symbol>(
   map: Map<string, T>,
-  cellMapper: Mapper<T> | RecordMapper<T>
+  cellMapper: Mapper<T> | RecordMapper<T>,
+  trimRight = false
 ) {
   const limits = [...map.keys()]
     .map(x => x.split(",").map(Number) as [number, number])
@@ -39,5 +40,5 @@ export default function printPositionsMap<T extends string | number | symbol>(
         .map((x, xx) => mapper(map.get([x, y].join(","))!, xx, yy, x, y) ?? "?")
         .join("")
     );
-  return result.join("\n");
+  return (trimRight ? result.map(x => x.trimRight()) : result).join("\n");
 }
