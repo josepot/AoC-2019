@@ -2,23 +2,23 @@ export default function binarySearch(
   cb: (x: number) => number,
   bottomLimit: number,
   topLimit: number,
-  selectTop: boolean
+  selectTop: boolean,
 ) {
-  let up = topLimit;
-  let down = bottomLimit;
+  let up = topLimit
+  let down = bottomLimit
 
-  let diff;
+  let diff
   while ((diff = Math.floor((up - down) / 2)) > 0) {
-    const result = cb(down + diff);
+    const result = cb(down + diff)
 
     if (result > 0) {
-      up -= diff;
+      up -= diff
     } else if (result < 0) {
-      down += diff;
+      down += diff
     } else {
-      return down + diff;
+      return down + diff
     }
   }
 
-  return selectTop ? up : down;
+  return selectTop ? up : down
 }

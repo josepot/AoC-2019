@@ -12,23 +12,30 @@
   "dependencies": {
     "big-integer": "^1.6.48",
     "id-permutations": "^1.0.3",
-    "immutable": "^4.0.0-rc.12",
+    "immutable": "^3.8.2",
     "md5": "^2.2.1",
     "priorityqueuejs": "^1.0.0",
     "ramda": "^0.26.1",
-    "rxjs": "^6.5.3"
+    "rxjs": "^6.5.4"
   },
   "devDependencies": {
     "@types/priorityqueuejs": "^1.0.1",
-    "@typescript-eslint/eslint-plugin": "^2.12.0",
-    "@typescript-eslint/parser": "^2.12.0",
-    "cross-env": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^2.19.2",
+    "@typescript-eslint/parser": "^2.19.2",
+    "babel-eslint": "^10.0.3",
+    "cross-env": "^7.0.0",
     "eslint": "^6.8.0",
-    "husky": "^3.1.0",
-    "lint-staged": "^9.5.0",
-    "prettier": "^1.13.7",
+    "eslint-config-ts-node": "^0.1.1",
+    "eslint-plugin-import": "^2.20.1",
+    "husky": "^4.2.2",
+    "lint-staged": "^10.0.7",
+    "prettier": "^1.19.1",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all"
   },
   "husky": {
     "hooks": {
@@ -36,13 +43,13 @@
     }
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write --with-node-modules",
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write",
       "git add"
     ]
   },
   "scripts": {
-    "format": "prettier --write \"src/**/*.js\" --with-node-modules",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "ts-solution": "ts-node -r tsconfig-paths/register ./src/index.js",
     "js-solution": "node ./src/index.js",
     "ts-test": "ts-node -r tsconfig-paths/register ./src/tests.js",

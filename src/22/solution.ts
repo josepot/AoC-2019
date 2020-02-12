@@ -1,60 +1,60 @@
 import {
   Position,
   getAdjacentPositions,
-  getPositionFromKey
-} from "utils/ts/directions";
-import graphDistinctSearch from "utils/ts/graphDistinctSearch";
-import { doubleCircularLinkedList } from "utils/ts/linkedLists";
-import bigInt, { BigInteger } from "big-integer";
+  getPositionFromKey,
+} from "utils/ts/directions"
+import graphDistinctSearch from "utils/ts/graphDistinctSearch"
+import { doubleCircularLinkedList } from "utils/ts/linkedLists"
+import bigInt, { BigInteger } from "big-integer"
 
-const deal1 = (cards: number[]): number[] => cards.slice(0).reverse();
+const deal1 = (cards: number[]): number[] => cards.slice(0).reverse()
 
 const deal2 = (cards: number[], n: number): number[] => {
   if (n >= 0) {
-    const part1 = cards.splice(0, n);
-    cards.push(...part1);
-    return cards;
+    const part1 = cards.splice(0, n)
+    cards.push(...part1)
+    return cards
   } else {
-    const part1 = cards.splice(n, -n);
-    part1.push(...cards);
-    return part1;
+    const part1 = cards.splice(n, -n)
+    part1.push(...cards)
+    return part1
   }
-};
+}
 
 const dealWithInc = (cards: number[], n: number) => {
-  const result = new Array(cards.length);
-  result.fill(Infinity);
-  let pos = 0;
+  const result = new Array(cards.length)
+  result.fill(Infinity)
+  let pos = 0
   cards.forEach(card => {
-    result[pos % cards.length] = card;
-    pos += n;
-  });
-  return result;
-};
+    result[pos % cards.length] = card
+    pos += n
+  })
+  return result
+}
 
 const solution1 = (lines: string[]) => {
   let cards = Array(10007)
     .fill(null)
-    .map((_, idx) => idx);
+    .map((_, idx) => idx)
 
   lines.forEach(line => {
-    const n = Number(line.split(" ").slice(-1)[0]);
+    const n = Number(line.split(" ").slice(-1)[0])
     if (line.startsWith("deal with increment ")) {
-      cards = dealWithInc(cards, n);
+      cards = dealWithInc(cards, n)
     } else if (line.startsWith("cut")) {
-      cards = deal2(cards, n);
+      cards = deal2(cards, n)
     } else {
-      cards = deal1(cards);
+      cards = deal1(cards)
     }
-  });
+  })
 
-  return cards.indexOf(2019);
-};
+  return cards.indexOf(2019)
+}
 
 const solution2 = (lines: string[]) => {
-  const nCards: BigInteger = bigInt(119315717514047);
+  const nCards: BigInteger = bigInt(119315717514047)
   // const nCards: BigInteger = bigInt(10007);
-  const iterations: BigInteger = bigInt(101741582076661);
+  const iterations: BigInteger = bigInt(101741582076661)
   /*
   initialFirstCardVal = 0
   initialInc = 1;
@@ -79,8 +79,8 @@ const solution2 = (lines: string[]) => {
   */
   const newStack = (increment: BigInteger, firstCardValue: BigInteger) => [
     increment.multiply(-1),
-    firstCardValue.minus(increment).mod(nCards)
-  ];
+    firstCardValue.minus(increment).mod(nCards),
+  ]
 
   /*
   cut(n):
@@ -103,9 +103,9 @@ const solution2 = (lines: string[]) => {
   const cut = (
     increment: BigInteger,
     firstCardValue: BigInteger,
-    n: BigInteger
+    n: BigInteger,
   ) =>
-    [increment, firstCardValue.add(increment.multiply(n)).mod(nCards)] as const;
+    [increment, firstCardValue.add(increment.multiply(n)).mod(nCards)] as const
 
   /*
   dealInc(n):
@@ -137,25 +137,25 @@ const solution2 = (lines: string[]) => {
   const dealInc = (
     increment: BigInteger,
     firstCardValue: BigInteger,
-    n: BigInteger
+    n: BigInteger,
   ) =>
-    [increment.multiply(n.modInv(nCards)).mod(nCards), firstCardValue] as const;
+    [increment.multiply(n.modInv(nCards)).mod(nCards), firstCardValue] as const
 
-  let firstCardValue = bigInt(0);
-  let inc = bigInt(1);
+  let firstCardValue = bigInt(0)
+  let inc = bigInt(1)
 
   // for (let i = 0; i < 20; i++) {
   lines.forEach(line => {
     if (line.startsWith("deal with increment ")) {
-      const n = bigInt(Number(line.split(" ").slice(-1)[0]));
-      [inc, firstCardValue] = dealInc(inc, firstCardValue, n);
+      const n = bigInt(Number(line.split(" ").slice(-1)[0]))
+      ;[inc, firstCardValue] = dealInc(inc, firstCardValue, n)
     } else if (line.startsWith("cut")) {
-      const n = bigInt(Number(line.split(" ").slice(-1)[0]));
-      [inc, firstCardValue] = cut(inc, firstCardValue, n);
+      const n = bigInt(Number(line.split(" ").slice(-1)[0]))
+      ;[inc, firstCardValue] = cut(inc, firstCardValue, n)
     } else {
-      [inc, firstCardValue] = newStack(inc, firstCardValue);
+      ;[inc, firstCardValue] = newStack(inc, firstCardValue)
     }
-  });
+  })
   // console.log(inc.toJSNumber(), firstCardValue.toJSNumber());
   // }
   // return;
@@ -170,22 +170,22 @@ const solution2 = (lines: string[]) => {
   }
    */
 
-  const finalInc = inc.modPow(iterations, nCards);
+  const finalInc = inc.modPow(iterations, nCards)
   const finalFirstCard = firstCardValue
     .multiply(
       bigInt(1)
         .minus(inc)
         .mod(nCards)
-        .modInv(nCards)
+        .modInv(nCards),
     )
-    .multiply(bigInt(1).minus(finalInc));
+    .multiply(bigInt(1).minus(finalInc))
 
   return finalFirstCard
     .add(bigInt(2020).multiply(finalInc))
     .mod(nCards)
     .add(nCards)
     .mod(nCards)
-    .toJSNumber();
-};
+    .toJSNumber()
+}
 
-export default [solution1, solution2];
+export default [solution1, solution2]

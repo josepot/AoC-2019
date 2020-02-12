@@ -1,56 +1,57 @@
-import { intCodeProcessor } from "utils/ts/intCodeGenerator";
+import { intCodeProcessor } from "utils/ts/intCodeGenerator"
 import {
   movePosition,
   Position,
   getAdjacentPositions,
   getPositionFromKey,
-  Direction
-} from "utils/ts/directions";
-import graphDistinctSearch from "utils/ts/graphDistinctSearch";
+  Direction,
+} from "utils/ts/directions"
+import graphDistinctSearch from "utils/ts/graphDistinctSearch"
 
 enum Cell {
   WALL = 0,
   OPEN = 1,
-  AIR = 2
+  AIR = 2,
 }
 
-const positionToKey = (x: Position) => x.x + "," + x.y;
+const positionToKey = (x: Position) => x.x + "," + x.y
 
 const getMaze = (line: string) => {
-  const visitedPositions = new Map<string, Cell>();
-  const closedPositions = new Set<string>();
-  visitedPositions.set("0,0", 1);
+  const visitedPositions = new Map<string, Cell>()
+  const closedPositions = new Set<string>()
+  visitedPositions.set("0,0", 1)
 
-  let currentPosition = { x: 0, y: 0, key: "0,0" };
-  let currentDirection: Direction;
+  let currentPosition = { x: 0, y: 0, key: "0,0" }
+  let currentDirection: Direction
 
   const processOutput = (status: Cell) => {
-    const nextPosition = movePosition(currentPosition, currentDirection);
-    visitedPositions.set(positionToKey(nextPosition), status);
+    const nextPosition = movePosition(currentPosition, currentDirection)
+    visitedPositions.set(positionToKey(nextPosition), status)
     if (status > 0) {
-      currentPosition = nextPosition;
+      currentPosition = nextPosition
     }
-  };
+  }
 
   const getNextDirection = () => {
     const unVisitedPositions = getAdjacentPositions(currentPosition).filter(
-      ({ key }) => !visitedPositions.has(key)
-    );
+      ({ key }) => !visitedPositions.has(key),
+    )
 
-    let nextTarget;
+    let nextTarget
     if (unVisitedPositions.length === 0) {
-      closedPositions.add(positionToKey(currentPosition));
+      closedPositions.add(positionToKey(currentPosition))
       const openPositions = getAdjacentPositions(currentPosition).filter(
-        ({ key }) => visitedPositions.get(key)! > 0 && !closedPositions.has(key)
-      );
-      if (openPositions.length === 0) return Infinity;
-      [nextTarget] = openPositions;
+        ({ key }) =>
+          visitedPositions.get(key)! > 0 && !closedPositions.has(key),
+      )
+      if (openPositions.length === 0) return Infinity
+      ;[nextTarget] = openPositions
     } else {
-      [nextTarget] = unVisitedPositions;
+      ;[nextTarget] = unVisitedPositions
     }
 
-    const xDiff = nextTarget.x - currentPosition.x;
-    const yDiff = nextTarget.y - currentPosition.y;
+    const xDiff = nextTarget.x - currentPosition.x
+    const yDiff = nextTarget.y - currentPosition.y
     return (currentDirection =
       yDiff === 0
         ? xDiff > 0
@@ -58,17 +59,17 @@ const getMaze = (line: string) => {
           : Direction.LEFT
         : yDiff > 0
         ? Direction.DOWN
-        : Direction.UP);
-  };
+        : Direction.UP)
+  }
 
-  intCodeProcessor<number>(line, processOutput, getNextDirection);
-  return visitedPositions;
-};
+  intCodeProcessor<number>(line, processOutput, getNextDirection)
+  return visitedPositions
+}
 
 interface Node {
-  id: string;
-  value: Cell;
-  steps: number;
+  id: string
+  value: Cell
+  steps: number
 }
 
 const solution1 = (maze: Map<string, Cell>) =>
@@ -80,30 +81,30 @@ const solution1 = (maze: Map<string, Cell>) =>
         .map(p => ({
           id: p.key,
           value: maze.get(p.key)!,
-          steps: node.steps + 1
+          steps: node.steps + 1,
         }))
         .filter(x => x.value !== Cell.WALL),
-    (a: Node, b: Node) => b.steps - a.steps
-  ).steps;
+    (a: Node, b: Node) => b.steps - a.steps,
+  ).steps
 
 const solution2 = (maze: Map<string, Cell>) => {
   const getNextPositions = (id: string) =>
     getAdjacentPositions(getPositionFromKey(id))
       .map(({ key }) => ({ id: key, value: maze.get(key)! }))
-      .filter(x => x.value === Cell.OPEN);
+      .filter(x => x.value === Cell.OPEN)
 
-  let minutes = 0;
+  let minutes = 0
   do {
-    [...maze.entries()]
+    ;[...maze.entries()]
       .filter(([, value]) => value === Cell.AIR)
       .forEach(([id]) => {
-        getNextPositions(id).forEach(p => maze.set(p.id, Cell.AIR));
-      });
-    minutes++;
-  } while ([...maze.values()].find(x => x === 1));
-  return minutes;
-};
+        getNextPositions(id).forEach(p => maze.set(p.id, Cell.AIR))
+      })
+    minutes++
+  } while ([...maze.values()].find(x => x === 1))
+  return minutes
+}
 
 export default [solution1, solution2].map(fn => ([line]: string) =>
-  fn(getMaze(line))
-);
+  fn(getMaze(line)),
+)

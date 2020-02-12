@@ -1,5 +1,5 @@
-const solution1 = lines => {};
+const solution1 = lines => {}
 
-const solution2 = lines => {};
+const solution2 = lines => {}
 
-module.exports = [solution1];
+module.exports = [solution1]
