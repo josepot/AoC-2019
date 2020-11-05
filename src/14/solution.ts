@@ -1,4 +1,4 @@
-import binarySearch from "utils/ts/binarySearch"
+import binarySearch from "utils/binarySearch"
 
 interface Node {
   id: string
@@ -8,7 +8,7 @@ interface Node {
 
 const getLine = (str: string) => {
   const [inputsRaw, targetRaw] = str.split(" => ")
-  const inputs = inputsRaw.split(", ").map(x => {
+  const inputs = inputsRaw.split(", ").map((x) => {
     const [rawNumber, key] = x.split(" ")
     return [key, Number(rawNumber)] as [string, number]
   })
@@ -42,9 +42,9 @@ const solution1 = (nodes: Map<string, Node>, nFuel = 1) => {
 }
 
 const solution2 = (nodes: Map<string, Node>) =>
-  binarySearch(x => solution1(nodes, x) - 1000000000000, 0, 10000000, false)
+  binarySearch((x) => solution1(nodes, x) - 1000000000000, 0, 10000000, false)
 
-export default [solution1, solution2].map(fn => (lines: string[]) => {
+export default [solution1, solution2].map((fn) => (lines: string[]) => {
   const nodes = new Map<string, Node>()
   lines.map(getLine).forEach(([left, [keyRight, nRight]]) => {
     nodes.set(keyRight, {

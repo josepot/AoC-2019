@@ -13,7 +13,7 @@ export default function printPositionsMap<T extends string | number | symbol>(
   cellMapper: Mapper<T> | RecordMapper<T>,
 ) {
   const limits = [...map.keys()]
-    .map(x => x.split(",").map(Number) as [number, number])
+    .map((x) => x.split(",").map(Number) as [number, number])
     .reduce(
       (acc, [x, y]) => ({
         left: Math.min(acc.left, x),

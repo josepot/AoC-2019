@@ -1,5 +1,3 @@
-export {}
-
 let output: number = -1
 
 const EXIT_CODE = 99
@@ -88,4 +86,4 @@ const solution = (inputVal: number) => (lines: string[]) => {
   return output
 }
 
-module.exports = [1, 5].map(solution)
+export default [1, 5].map(solution)

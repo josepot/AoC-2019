@@ -1,9 +1,6 @@
-const { getPermutationsFromId: gPFID } = require("id-permutations")(5)
+import idPermutations from "id-permutations"
+const { getPermutationsFromId } = idPermutations(5)
 
-const getPermutationsFromId: (x: number) => number[] = (x: number) => {
-  const result: number[] = gPFID(x)
-  return result
-}
 const nPermutations = 5 * 4 * 3 * 2
 
 const solution1 = ([line]: string) => {
@@ -12,11 +9,11 @@ const solution1 = ([line]: string) => {
   for (let i = 0; i < nPermutations; i++) {
     const permutations = getPermutationsFromId(i)
     const generators = permutations
-      .map(idx => getGeneratorFn(line, idx))
-      .map(generator => generator())
+      .map((idx) => getGeneratorFn(line, idx))
+      .map((generator) => generator())
 
     let output = 0
-    permutations.forEach(idx => {
+    permutations.forEach((idx) => {
       generators[idx].next()
       output = generators[idx].next(output).value as number
     })
@@ -32,8 +29,8 @@ const solution2 = ([line]: string) => {
   for (let i = 0; i < nPermutations; i++) {
     const permutations = getPermutationsFromId(i)
     const generators = permutations
-      .map(idx => getGeneratorFn(line, idx + 5))
-      .map(generator => generator())
+      .map((idx) => getGeneratorFn(line, idx + 5))
+      .map((generator) => generator())
 
     let lastOutput = 0
     let ii = 0

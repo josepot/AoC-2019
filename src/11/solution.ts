@@ -1,13 +1,13 @@
-import { intCodeProcessor } from "utils/ts/intCodeGenerator"
-import { getDirectionWheel, movePosition, Position } from "utils/ts/directions"
-import printPositionsMap from "utils/ts/printPositionsMap"
+import { intCodeProcessor } from "utils/intCodeGenerator"
+import { getDirectionWheel, movePosition, Position } from "utils/directions"
+import printPositionsMap from "utils/printPositionsMap"
 
 const solutions: ((visitedPositions: Map<string, number>) => any)[] = [
-  map => map.size,
-  map => printPositionsMap(map, x => (x ? "#" : " ")),
+  (map) => map.size,
+  (map) => printPositionsMap(map, (x) => (x ? "#" : " ")),
 ]
 
-export default [0, 1].map(idx => ([line]: string) => {
+export default [0, 1].map((idx) => ([line]: string) => {
   const visitedPositions = new Map<string, number>()
   const getInput = ({ x, y }: Position): number =>
     visitedPositions.get([x, y].join(",")) ?? 0

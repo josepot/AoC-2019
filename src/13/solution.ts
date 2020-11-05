@@ -1,11 +1,11 @@
-import { intCodeProcessor } from "utils/ts/intCodeGenerator"
+import { intCodeProcessor } from "utils/intCodeGenerator"
 
 const solution1 = ([line]: string) => {
   const visitedPositions = new Map<string, number>()
 
   intCodeProcessor(line, (x, y, z) => visitedPositions.set([x, y].join(","), z))
 
-  return [...visitedPositions.values()].filter(x => x === 2).length
+  return [...visitedPositions.values()].filter((x) => x === 2).length
 }
 
 const solution2 = ([line]: string) => {

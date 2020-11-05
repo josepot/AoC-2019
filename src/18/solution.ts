@@ -3,15 +3,15 @@ import {
   getAdjacentPositions,
   getPositionFromKey,
   getDiagonalPositions,
-} from "utils/ts/directions"
-import graphDistinctSearch from "utils/ts/graphDistinctSearch"
+} from "utils/directions"
+import graphDistinctSearch from "utils/graphDistinctSearch"
 
 const solution = (positions: Map<string, string>) => {
   const initialPositions = [...positions.entries()]
     .filter(([, val]) => val === "@")
     .map(([key]) => getPositionFromKey(key))
 
-  initialPositions.forEach(x => positions.set(x.key, "."))
+  initialPositions.forEach((x) => positions.set(x.key, "."))
 
   const getKeysDataFromPos = (currentPosition: Position) => {
     interface Metadata {
@@ -43,8 +43,8 @@ const solution = (positions: Map<string, string>) => {
             }
           }
           return getAdjacentPositions(getPositionFromKey(node.id))
-            .filter(p => positions.get(p.key) !== "#")
-            .map(x => ({
+            .filter((p) => positions.get(p.key) !== "#")
+            .map((x) => ({
               id: x.key,
               distance: node.distance + 1,
               keysRequired,
@@ -57,11 +57,11 @@ const solution = (positions: Map<string, string>) => {
     return result
   }
 
-  const fromStart = initialPositions.map(x => getKeysDataFromPos(x))
+  const fromStart = initialPositions.map((x) => getKeysDataFromPos(x))
   const keysGraph = new Map<string, ReturnType<typeof getKeysDataFromPos>>()
   fromStart.forEach((x, idx) => {
     keysGraph.set(idx.toString(10), x)
-    ;[...x.keys()].forEach(key =>
+    ;[...x.keys()].forEach((key) =>
       keysGraph.set(
         key,
         getKeysDataFromPos(getPositionFromKey(x.get(key)!.id)),
@@ -73,7 +73,7 @@ const solution = (positions: Map<string, string>) => {
     [...keysGraph.get(currentKey)!.entries()]
       .filter(
         ([x, { keysRequired }]) =>
-          !keys.has(x) && keysRequired.every(k => keys.has(k)),
+          !keys.has(x) && keysRequired.every((k) => keys.has(k)),
       )
       .map(([key, { distance, keysFound }]) => ({ key, distance, keysFound }))
 
@@ -85,8 +85,8 @@ const solution = (positions: Map<string, string>) => {
     const cacheKey = [...current, ...[...keys].sort()].join(",")
     if (cache.has(cacheKey)) return cache.get(cacheKey)!
 
-    const nextKeysByRobot = current.map(x => getNextKeysAtReach(x, keys))
-    if (nextKeysByRobot.every(x => x.length === 0)) return 0
+    const nextKeysByRobot = current.map((x) => getNextKeysAtReach(x, keys))
+    if (nextKeysByRobot.every((x) => x.length === 0)) return 0
 
     const result = Math.min(
       ...nextKeysByRobot
@@ -122,13 +122,17 @@ const solution2 = (positions: Map<string, string>) => {
     .map(([key]) => getPositionFromKey(key))
 
   positions.set(initialPosition.key, "#")
-  getAdjacentPositions(initialPosition).forEach(x => positions.set(x.key, "#"))
-  getDiagonalPositions(initialPosition).forEach(x => positions.set(x.key, "@"))
+  getAdjacentPositions(initialPosition).forEach((x) =>
+    positions.set(x.key, "#"),
+  )
+  getDiagonalPositions(initialPosition).forEach((x) =>
+    positions.set(x.key, "@"),
+  )
 
   return solution(positions)
 }
 
-export default [solution1, solution2].map(fn => (lines: string[]) => {
+export default [solution1, solution2].map((fn) => (lines: string[]) => {
   const positions = new Map<string, string>()
   lines.forEach((line, y) =>
     line.split("").forEach((value, x) => {

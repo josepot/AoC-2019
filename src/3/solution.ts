@@ -1,4 +1,4 @@
-import add from "utils/ts/add"
+import add from "utils/add"
 
 export {}
 
@@ -11,10 +11,10 @@ const directionInstructions: Record<Direction, ["x" | "y", number]> = {
 }
 
 const getWires = (lines: string[]) =>
-  lines.map(x =>
+  lines.map((x) =>
     x
       .split(",")
-      .map(w => ({ direction: w[0] as Direction, len: Number(w.slice(1)) })),
+      .map((w) => ({ direction: w[0] as Direction, len: Number(w.slice(1)) })),
   )
 
 const solution1 = (lines: string[]) => {
@@ -39,12 +39,12 @@ const solution1 = (lines: string[]) => {
   })
 
   return [...grid.keys()]
-    .filter(key => grid.get(key)!.size === 2)
-    .map(key =>
+    .filter((key) => grid.get(key)!.size === 2)
+    .map((key) =>
       key
         .split(",")
         .map(Number)
-        .map(x => Math.abs(x))
+        .map((x) => Math.abs(x))
         .reduce(add),
     )
     .sort((a, b) => a - b)[0]
@@ -74,9 +74,9 @@ const solution2 = (lines: string[]) => {
   })
 
   return [...grid.keys()]
-    .filter(key => grid.get(key)!.size === 2)
-    .map(key => grid.get(key)!.get(0)! + grid.get(key)!.get(1)!)
+    .filter((key) => grid.get(key)!.size === 2)
+    .map((key) => grid.get(key)!.get(0)! + grid.get(key)!.get(1)!)
     .sort((a, b) => a - b)[0]
 }
 
-module.exports = [solution1, solution2]
+export default [solution1, solution2]

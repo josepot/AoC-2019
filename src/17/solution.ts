@@ -1,4 +1,4 @@
-import { intCodeProcessor } from "utils/ts/intCodeGenerator"
+import { intCodeProcessor } from "utils/intCodeGenerator"
 import {
   movePosition,
   Position,
@@ -7,7 +7,7 @@ import {
   getDirectionWheel,
   turnWheel,
   getPositionFromKey,
-} from "utils/ts/directions"
+} from "utils/directions"
 
 const PATH_CODE = "#".charCodeAt(0)
 const positions = new Map<string, number>()
@@ -29,7 +29,7 @@ const solution1 = ([line]: string[]) => {
     .filter(([, val]) => val === PATH_CODE)
     .map(([key]) => getPositionFromKey(key))
     .filter(
-      x =>
+      (x) =>
         getAdjacentPositions(x).filter(
           ({ key }) => positions.get(key) === PATH_CODE,
         ).length === 4,
@@ -38,7 +38,7 @@ const solution1 = ([line]: string[]) => {
 }
 
 const findPath = (positions: Map<string, number>) => {
-  const possibleRobotVals = ["^", "v", "<", ">"].map(x => x.charCodeAt(0))
+  const possibleRobotVals = ["^", "v", "<", ">"].map((x) => x.charCodeAt(0))
   const [initialPositionKey, initialPositionVal] = [
     ...positions.entries(),
   ].find(([, val]) => possibleRobotVals.indexOf(val) > -1)!
@@ -61,9 +61,9 @@ const findPath = (positions: Map<string, number>) => {
       wheel.value,
       wheel.left.value,
       wheel.right.value,
-    ].map(direction => movePosition(currentPosition, direction))
+    ].map((direction) => movePosition(currentPosition, direction))
     const winnerIdx = nextCandidates.findIndex(
-      x => positions.get(x.key) === PATH_CODE,
+      (x) => positions.get(x.key) === PATH_CODE,
     )
     i++
 
@@ -85,11 +85,11 @@ const findPath = (positions: Map<string, number>) => {
 
 const getNextChunks = (candidate: string, chunks: string[]): string[] =>
   chunks
-    .map(chunk =>
+    .map((chunk) =>
       chunk
         .split(candidate)
-        .map(x => (x.startsWith(",") ? x.slice(1) : x))
-        .map(x => (x.endsWith(",") ? x.slice(0, -1) : x))
+        .map((x) => (x.startsWith(",") ? x.slice(1) : x))
+        .map((x) => (x.endsWith(",") ? x.slice(0, -1) : x))
         .filter(Boolean),
     )
     .flat()
@@ -129,11 +129,11 @@ const getMainSequence = (path: string, sequences: string[]) => {
   const result: number[] = []
   let left = path
   do {
-    const idx = sequences.findIndex(s => left.startsWith(s))
+    const idx = sequences.findIndex((s) => left.startsWith(s))
     result.push(idx)
     left = left.slice(sequences[idx].length + 1)
   } while (left.length > 0)
-  return result.map(x => String.fromCharCode(65 + x)).join(",")
+  return result.map((x) => String.fromCharCode(65 + x)).join(",")
 }
 
 const solution2 = ([line]: string[]) => {
@@ -146,10 +146,10 @@ const solution2 = ([line]: string[]) => {
     const mainSequence = getMainSequence(path, keySequences)
 
     return (solution = [mainSequence, ...keySequences, "n"]
-      .map(x =>
+      .map((x) =>
         x
           .split("")
-          .map(x => x.charCodeAt(0))
+          .map((x) => x.charCodeAt(0))
           .concat(10),
       )
       .flat())

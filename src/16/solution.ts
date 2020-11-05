@@ -1,5 +1,5 @@
-import { circularLinkedList } from "utils/ts/linkedLists"
-import add from "utils/ts/add"
+import { circularLinkedList } from "utils/linkedLists"
+import add from "utils/add"
 
 const solution1 = ([line]: string) => {
   const circularList = circularLinkedList([0, 1, 0, -1])
@@ -9,7 +9,7 @@ const solution1 = ([line]: string) => {
     let counter = 1
     return Math.abs(
       n
-        .map(currentNumber => {
+        .map((currentNumber) => {
           if (counter++ % (idx + 1) === 0) {
             x = x.next
           }
@@ -45,10 +45,7 @@ const solution2 = ([line]: string) => {
     }
   }
 
-  return output
-    .reverse()
-    .slice(0, 8)
-    .join("")
+  return output.reverse().slice(0, 8).join("")
 }
 
 export default [solution1, solution2]

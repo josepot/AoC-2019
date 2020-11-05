@@ -75,7 +75,7 @@ const solution2 = (
   let currentRound = [...asteroidsInSight.values()]
   let totalDestroyedAsteroids = currentRound.length
   while (totalDestroyedAsteroids < N_WINNER) {
-    currentRound.forEach(key => map.delete(key))
+    currentRound.forEach((key) => map.delete(key))
     currentRound = [...getAsteroidsInSight(baseX, baseY).values()]
     totalDestroyedAsteroids += currentRound.length
   }
@@ -83,13 +83,13 @@ const solution2 = (
   const winnerIdx =
     N_WINNER - (totalDestroyedAsteroids - currentRound.length) - 1
   const [winnerX, winnerY] = currentRound
-    .map(key => key.split(",").map(Number) as [number, number])
+    .map((key) => key.split(",").map(Number) as [number, number])
     .map(([x, y]) => [x - baseX, baseY - y] as [number, number])
     .sort((a, b) => getClockwiseAngle(a) - getClockwiseAngle(b))[winnerIdx]
 
   return (winnerX + baseX) * 100 + (baseY - winnerY)
 }
 
-export default [solution1, solution2].map(fn => (lines: string[]) =>
+export default [solution1, solution2].map((fn) => (lines: string[]) =>
   fn(...getBaseAsteroidWithAsteroidsInSight(lines)),
 )

@@ -8,7 +8,7 @@ export default class Stack<T> {
 
   constructor(vals?: T[]) {
     if (vals === undefined) return
-    vals.forEach(val => this.push(val))
+    vals.forEach((val) => this.push(val))
   }
   push(value: T) {
     this.current = { value, prev: this.current }

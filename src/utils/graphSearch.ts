@@ -12,7 +12,7 @@ const graphSearch = <T>(
     const currentNode = nodesToAnalize.deq()
     const result = analizeNode(currentNode)
     if (result === true) return currentNode
-    result.forEach(x => nodesToAnalize.enq(x))
+    result.forEach((x) => nodesToAnalize.enq(x))
   } while (nodesToAnalize.size() > 0)
 
   throw new Error("No match")

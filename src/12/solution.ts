@@ -1,11 +1,11 @@
-import add from "utils/ts/add"
+import add from "utils/add"
 
 type Moon = [[number, number, number], [number, number, number]]
 
 const compare = (a: number, b: number) => (b > a ? 1 : b < a ? -1 : 0)
 
 const getNextVelocity = (moons: Moon[], moon: Moon): Moon => {
-  const otherMoons = moons.filter(x => x !== moon)
+  const otherMoons = moons.filter((x) => x !== moon)
 
   return otherMoons.reduce(
     ([[posX, posY, posZ], [velX, velY, velZ]], [[x, y, z]]) => [
@@ -40,7 +40,7 @@ const solution1 = (lines: string[]) => {
   let moons = lines.map(fromLineToMoon)
 
   for (let time = 0; time < 1000; time++) {
-    moons = moons.map(moon => getNextVelocity(moons, moon))
+    moons = moons.map((moon) => getNextVelocity(moons, moon))
     moons = getNextPositions(moons)
   }
 
@@ -52,7 +52,7 @@ const solution1 = (lines: string[]) => {
 const getMoonAxisKey = (moon: Moon, axis: number) =>
   [moon[0][axis], moon[1][axis]].join(",")
 const getMoonsAxisKey = (moons: Moon[], axis: number) =>
-  moons.map(moon => getMoonAxisKey(moon, axis)).join(".")
+  moons.map((moon) => getMoonAxisKey(moon, axis)).join(".")
 
 const findAxisPeriod = (lines: string[], axis: number) => {
   let moons = lines.map(fromLineToMoon)
@@ -62,7 +62,7 @@ const findAxisPeriod = (lines: string[], axis: number) => {
 
   do {
     history.add(key)
-    moons = moons.map(moon => getNextVelocity(moons, moon))
+    moons = moons.map((moon) => getNextVelocity(moons, moon))
     moons = getNextPositions(moons)
     key = getMoonsAxisKey(moons, axis)
     count++
@@ -83,6 +83,8 @@ const minimumCommonMultiple = (a: number, b: number) =>
   (a * b) / largestDivisor(a, b)
 
 const solution2 = (lines: string[]) =>
-  [0, 1, 2].map(idx => findAxisPeriod(lines, idx)).reduce(minimumCommonMultiple)
+  [0, 1, 2]
+    .map((idx) => findAxisPeriod(lines, idx))
+    .reduce(minimumCommonMultiple)
 
 export default [solution1, solution2]

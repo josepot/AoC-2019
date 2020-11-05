@@ -1,12 +1,12 @@
-import { intCodeProcessor } from "utils/ts/intCodeGenerator"
+import { intCodeProcessor } from "utils/intCodeGenerator"
 import {
   movePosition,
   Position,
   getAdjacentPositions,
   getPositionFromKey,
   Direction,
-} from "utils/ts/directions"
-import graphDistinctSearch from "utils/ts/graphDistinctSearch"
+} from "utils/directions"
+import graphDistinctSearch from "utils/graphDistinctSearch"
 
 enum Cell {
   WALL = 0,
@@ -78,12 +78,12 @@ const solution1 = (maze: Map<string, Cell>) =>
     (node: Node) =>
       node.value === Cell.AIR ||
       getAdjacentPositions(getPositionFromKey(node.id))
-        .map(p => ({
+        .map((p) => ({
           id: p.key,
           value: maze.get(p.key)!,
           steps: node.steps + 1,
         }))
-        .filter(x => x.value !== Cell.WALL),
+        .filter((x) => x.value !== Cell.WALL),
     (a: Node, b: Node) => b.steps - a.steps,
   ).steps
 
@@ -91,20 +91,20 @@ const solution2 = (maze: Map<string, Cell>) => {
   const getNextPositions = (id: string) =>
     getAdjacentPositions(getPositionFromKey(id))
       .map(({ key }) => ({ id: key, value: maze.get(key)! }))
-      .filter(x => x.value === Cell.OPEN)
+      .filter((x) => x.value === Cell.OPEN)
 
   let minutes = 0
   do {
     ;[...maze.entries()]
       .filter(([, value]) => value === Cell.AIR)
       .forEach(([id]) => {
-        getNextPositions(id).forEach(p => maze.set(p.id, Cell.AIR))
+        getNextPositions(id).forEach((p) => maze.set(p.id, Cell.AIR))
       })
     minutes++
-  } while ([...maze.values()].find(x => x === 1))
+  } while ([...maze.values()].find((x) => x === 1))
   return minutes
 }
 
-export default [solution1, solution2].map(fn => ([line]: string) =>
+export default [solution1, solution2].map((fn) => ([line]: string) =>
   fn(getMaze(line)),
 )
