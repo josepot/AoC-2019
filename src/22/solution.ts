@@ -1,10 +1,3 @@
-import {
-  Position,
-  getAdjacentPositions,
-  getPositionFromKey,
-} from "utils/ts/directions"
-import graphDistinctSearch from "utils/ts/graphDistinctSearch"
-import { doubleCircularLinkedList } from "utils/ts/linkedLists"
 import bigInt, { BigInteger } from "big-integer"
 
 const deal1 = (cards: number[]): number[] => cards.slice(0).reverse()
@@ -25,7 +18,7 @@ const dealWithInc = (cards: number[], n: number) => {
   const result = new Array(cards.length)
   result.fill(Infinity)
   let pos = 0
-  cards.forEach(card => {
+  cards.forEach((card) => {
     result[pos % cards.length] = card
     pos += n
   })
@@ -37,7 +30,7 @@ const solution1 = (lines: string[]) => {
     .fill(null)
     .map((_, idx) => idx)
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     const n = Number(line.split(" ").slice(-1)[0])
     if (line.startsWith("deal with increment ")) {
       cards = dealWithInc(cards, n)
@@ -145,7 +138,7 @@ const solution2 = (lines: string[]) => {
   let inc = bigInt(1)
 
   // for (let i = 0; i < 20; i++) {
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith("deal with increment ")) {
       const n = bigInt(Number(line.split(" ").slice(-1)[0]))
       ;[inc, firstCardValue] = dealInc(inc, firstCardValue, n)
@@ -172,12 +165,7 @@ const solution2 = (lines: string[]) => {
 
   const finalInc = inc.modPow(iterations, nCards)
   const finalFirstCard = firstCardValue
-    .multiply(
-      bigInt(1)
-        .minus(inc)
-        .mod(nCards)
-        .modInv(nCards),
-    )
+    .multiply(bigInt(1).minus(inc).mod(nCards).modInv(nCards))
     .multiply(bigInt(1).minus(finalInc))
 
   return finalFirstCard

@@ -1,28 +1,20 @@
-const { compose: c, init, split, tap, ifElse, head } = require("ramda")
-const { promisify } = require("util")
+const {promisify} = require("util")
 const fs = require("fs")
 const path = require("path")
-const { isObservable } = require("rxjs")
+const {isObservable} = require("rxjs")
 const https = require("https")
 const qs = require("querystring")
 const getSession = require("./getSession")
-const { askQuestion, rl } = require("./utils/askQuestion")
+const readline = require("readline")
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+})
+const askQuestion = (x) => new Promise((res) => rl.question(x, res))
 
 const relPath = path.resolve(__dirname)
-let start
-const log = v => {
-  let end = Date.now()
-  if (isObservable(v)) {
-    return v.subscribe(console.log, console.error)
-  }
-  console.log(v)
-  console.log(`Solved in ${end - start}ms`)
-}
 const readFile = promisify(fs.readFile)
-const getLines = c(
-  ifElse(x => x.length > 1, init, head),
-  split("\n"),
-)
 
 const [cmdName, , day_, idx] = process.argv
 const day = day_ || new Date().getDate()
@@ -38,8 +30,8 @@ const fn =
   idx !== undefined
     ? fns[idx]
     : Array.isArray(fns)
-    ? fns.filter(Boolean).slice(-1)[0]
-    : fns
+      ? fns.filter(Boolean).slice(-1)[0]
+      : fns
 
 const submitSolution = async (solution, level, session, year) => {
   console.log(
@@ -63,15 +55,15 @@ const submitSolution = async (solution, level, session, year) => {
           "Content-Length": postData.length,
         },
       },
-      res => {
+      (res) => {
         let result = ""
-        res.on("data", function(chunk) {
+        res.on("data", function (chunk) {
           result += chunk
         })
-        res.on("end", function() {
+        res.on("end", function () {
           resolve(result)
         })
-        res.on("error", function(err) {
+        res.on("error", function (err) {
           reject(err)
         })
       },
@@ -98,7 +90,7 @@ const submitSolution = async (solution, level, session, year) => {
   if (waitMatch) {
     const secsToWait = Number(waitMatch[1])
     console.log(`Waiting ${secsToWait} seconds before re-submitting...`)
-    await new Promise(res => setTimeout(res, secsToWait * 1000))
+    await new Promise((res) => setTimeout(res, secsToWait * 1000))
     return await submitSolution(solution, level, session, year)
   }
 
@@ -107,7 +99,7 @@ const submitSolution = async (solution, level, session, year) => {
 
 const defaultPart = Array.isArray(fns) && fns.length
 
-const submit = async solution => {
+const submit = async (solution) => {
   try {
     const session = await getSession()
     if (!session) return
@@ -126,15 +118,30 @@ const submit = async solution => {
   }
 }
 
+const getInput = (text) => {
+  const lines = text.split("\n")
+  let input
+  if (lines.length > 2) {
+    lines.splice(-1, 1)
+    input = lines
+  } else {
+    input = lines[0]
+  }
+  return input
+}
+
 readFile(`${dayPath}/input`, "utf-8")
-  .then(
-    c(
-      tap(() => (start = Date.now())),
-      getLines,
-    ),
-  )
-  .then(lines => fn(lines))
-  .then(result => {
-    log(result)
-    submit(result)
+  .then(getInput)
+  .then((input) => {
+    const start = Date.now()
+    const result = fn(input)
+    const end = Date.now()
+
+    if (isObservable(result)) {
+      return result.subscribe(console.log, console.error)
+    }
+    console.log(result)
+    console.log(`Solved in ${end - start}ms`)
+    return result
   })
+  .then(submit)

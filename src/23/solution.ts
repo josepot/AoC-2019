@@ -1,4 +1,4 @@
-import { intCodeProcessors } from "utils/ts/intCodeGenerator"
+import { intCodeProcessors } from "utils/intCodeGenerator"
 
 const emptyResult = [-1]
 const solution1 = ([line]: string[]) => {
@@ -16,7 +16,7 @@ const solution1 = ([line]: string[]) => {
       }
       inputs[address].push(x, y)
     },
-    idx => {
+    (idx) => {
       if (result) return undefined
       const res = inputs[idx].splice(0, 2)
       return res.length === 0 ? emptyResult : res
@@ -44,13 +44,13 @@ const solution2 = ([line]: string[]) => {
         inputs[address].push(x, y)
       }
     },
-    idx => {
+    (idx) => {
       if (result) return undefined
       const res = inputs[idx].splice(0, 2)
       return res.length === 0 ? emptyResult : res
     },
     () => {
-      if (natPacket && inputs.every(i => i.length === 0)) {
+      if (natPacket && inputs.every((i) => i.length === 0)) {
         idleCounter++
       }
       if (idleCounter > 5 && natPacket) {

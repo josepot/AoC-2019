@@ -1,5 +1,5 @@
-import { intCodeProcessor } from "utils/ts/intCodeGenerator"
-import printPositionsMap from "utils/ts/printPositionsMap"
+import { intCodeProcessor } from "utils/intCodeGenerator"
+import printPositionsMap from "utils/printPositionsMap"
 
 const positions = new Map<string, number>()
 let currentX = 0
@@ -53,14 +53,14 @@ previous && (e || e)
 */
 
 export default [aInstructions, bInstructions].map(
-  instructions => ([line]: string[]) => {
+  (instructions) => ([line]: string[]) => {
     const result = intCodeProcessor(
       line,
       buildGrid,
       parseInstructions(instructions),
     )
     if (result < 1000) {
-      console.log(printPositionsMap(positions, x => String.fromCharCode(x)))
+      console.log(printPositionsMap(positions, (x) => String.fromCharCode(x)))
       return
     }
     return result
@@ -74,5 +74,5 @@ const parseInstructions = (instructions: string) =>
     .slice(0, -1)
     .join("\n")
     .split("")
-    .map(x => (x === "\n" ? 10 : x.charCodeAt(0)))
+    .map((x) => (x === "\n" ? 10 : x.charCodeAt(0)))
     .concat(10)

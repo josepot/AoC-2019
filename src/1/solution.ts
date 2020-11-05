@@ -1,4 +1,4 @@
-import add from "utils/ts/add"
+import add from "utils/add"
 
 const getFuel = (x: number) => Math.floor(x / 3) - 2
 const getRecursiveFuel = (x: number): number => {
@@ -7,15 +7,9 @@ const getRecursiveFuel = (x: number): number => {
 }
 
 const solution1 = (lines: string[]) =>
-  lines
-    .map(Number)
-    .map(getFuel)
-    .reduce(add)
+  lines.map(Number).map(getFuel).reduce(add)
 
 const solution2 = (lines: string[]) =>
-  lines
-    .map(Number)
-    .map(getRecursiveFuel)
-    .reduce(add)
+  lines.map(Number).map(getRecursiveFuel).reduce(add)
 
 export default [solution1, solution2]

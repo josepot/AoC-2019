@@ -1,5 +1,3 @@
-export {}
-
 const operations: Record<number, (...args: number[]) => number> = {
   1: (a: number, b: number) => a + b,
   2: (a: number, b: number) => a * b,
@@ -45,4 +43,4 @@ const solution2 = (lines: string[]) => {
   return "Something bad happened"
 }
 
-module.exports = [solution1, solution2]
+export default [solution1, solution2]
