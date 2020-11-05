@@ -1,5 +1,3 @@
-export {}
-
 const checkIsValid1 = (arr: number[]) => {
   let twoAdjacent = false
   let alwaysDecrease = true
@@ -30,10 +28,7 @@ const solution = (checkFn: (x: number[]) => boolean) => ([input]: string[]) => {
   const [FROM, TO] = input.split("-").map(Number)
   let nValid = 0
   for (let i = FROM; i < TO; i++) {
-    const digits = i
-      .toString(10)
-      .split("")
-      .map(Number)
+    const digits = i.toString(10).split("").map(Number)
 
     if (checkFn(digits)) {
       nValid++
@@ -42,4 +37,4 @@ const solution = (checkFn: (x: number[]) => boolean) => ([input]: string[]) => {
   return nValid
 }
 
-module.exports = [checkIsValid1, checkIsValid2].map(solution)
+export default [checkIsValid1, checkIsValid2].map(solution)

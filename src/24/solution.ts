@@ -1,11 +1,11 @@
-import { getAdjacentPositions, getPositionFromKey } from "utils/ts/directions"
-import add from "utils/ts/add"
+import { getAdjacentPositions, getPositionFromKey } from "utils/directions"
+import add from "utils/add"
 
 const getNextPosition = (current: Map<string, boolean>) => {
   return new Map<string, boolean>(
     [...current.entries()].map(([key, val]) => {
       const nBugs = getAdjacentPositions(getPositionFromKey(key))
-        .map(x => current.get(x.key))
+        .map((x) => current.get(x.key))
         .filter(Boolean).length
 
       return [key, nBugs === 1 || (!val && nBugs === 2)]
@@ -96,7 +96,7 @@ const solution2 = (lines: string[]) => {
         result.push([level - 1, 4, yy])
       }
     }
-    return result.map(x => x.join(","))
+    return result.map((x) => x.join(","))
   }
 
   const getNextRecursivePosition = (
@@ -105,7 +105,7 @@ const solution2 = (lines: string[]) => {
     current: Map<string, boolean>,
   ) => {
     const nBugs = getRecurrentAdjacentPositions(key)
-      .map(x => current.get(x))
+      .map((x) => current.get(x))
       .filter(Boolean).length
 
     return nBugs === 1 || (!val && nBugs === 2)

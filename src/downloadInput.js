@@ -10,7 +10,7 @@ const now = new Date()
 const year = year_ || now.getFullYear()
 const day = day_ || now.getDate()
 
-const getFile = session =>
+const getFile = (session) =>
   new Promise((resolve, reject) =>
     https
       .get(
@@ -27,7 +27,7 @@ const getFile = session =>
       .on("error", reject),
   )
 
-const writeFile = stream =>
+const writeFile = (stream) =>
   new Promise((resolve, reject) => {
     const file = fs.createWriteStream(`${relPath}/${day}/input`)
     stream.pipe(file)
@@ -38,7 +38,7 @@ const writeFile = stream =>
 getSession()
   .then(getFile)
   .then(writeFile)
-  .catch(e => {
+  .catch((e) => {
     console.log("Error downloading the file")
     console.log(e)
   })

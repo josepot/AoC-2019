@@ -24,9 +24,9 @@ interface DoubleCircularLinkedListNode<T> {
 }
 
 export const linkedList = <T>(values: T[]) => {
-  const instances: LinkedListNode<T>[] = values.map(value => ({ value }))
+  const instances: LinkedListNode<T>[] = values.map((value) => ({ value }))
   range(0, values.length - 1).forEach(
-    idx => (instances[idx].next = instances[idx + 1]),
+    (idx) => (instances[idx].next = instances[idx + 1]),
   )
   return instances
 }

@@ -14,11 +14,7 @@ export type GeneratorResult = GeneratorReturnType<IntCodeGenetator>
 const getOperationKeyModes = (x: number) => {
   const operationKeyRaw = x.toString(10).padStart(5, "0")
   const iKey = Number(operationKeyRaw.substring(3))
-  const modes = operationKeyRaw
-    .substring(0, 3)
-    .split("")
-    .map(Number)
-    .reverse()
+  const modes = operationKeyRaw.substring(0, 3).split("").map(Number).reverse()
   return [iKey, modes] as const
 }
 
@@ -186,7 +182,7 @@ export function intCodeProcessors<T extends number>(
     .fill(null)
     .map(() => intCodeGenerator(line))
   const statusses = generators.map(() => true)
-  const generatorLatestResults = generators.map(g => g.next())
+  const generatorLatestResults = generators.map((g) => g.next())
 
   const args = new Array<T>(outputFn.length - 1)
 
@@ -202,7 +198,7 @@ export function intCodeProcessors<T extends number>(
         if (inputs === undefined) {
           statusses[idx] = false
         } else {
-          inputs.forEach(input => {
+          inputs.forEach((input) => {
             generatorLatestResults[idx] = generator.next(input)
           })
         }

@@ -6,5 +6,5 @@ const readFile = promisify(fs.readFile)
 
 module.exports = () =>
   readFile(`${relPath}/../.session`, "utf-8")
-    .then(x => x.replace("\n", ""))
+    .then((x) => x.replace("\n", ""))
     .catch(() => "")

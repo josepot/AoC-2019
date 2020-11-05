@@ -1,5 +1,5 @@
 export function readGrid<T>(lines: string[], getCellData: (i: string) => T) {
-  return getGrid(lines.map(line => line.split("").map(getCellData)))
+  return getGrid(lines.map((line) => line.split("").map(getCellData)))
 }
 
 export function getGrid<T>(data: T[][]) {
@@ -15,7 +15,7 @@ export function getGrid<T>(data: T[][]) {
       [0, 1],
     ]
       .map(([diffX, diffY]) => getCell(x + diffX, y + diffY))
-      .filter(x => x !== undefined)
+      .filter((x) => x !== undefined)
   const getDiagonalNeighbours = (x: number, y: number) =>
     [
       [-1, -1],
@@ -24,7 +24,7 @@ export function getGrid<T>(data: T[][]) {
       [1, 1],
     ]
       .map(([diffX, diffY]) => getCell(x + diffX, y + diffY))
-      .filter(x => x !== undefined)
+      .filter((x) => x !== undefined)
   const getAllNeighbours = (x: number, y: number) =>
     getCrossNeighbours(x, y).concat(getDiagonalNeighbours(x, y))
 

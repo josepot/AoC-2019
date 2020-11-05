@@ -9,11 +9,11 @@ export default class Queue<T> {
 
   constructor(...vals: T[]) {
     if (vals.length === 0) return
-    vals.forEach(val => this.push(val))
+    vals.forEach((val) => this.push(val))
   }
 
   push(...values: T[]) {
-    values.forEach(value => {
+    values.forEach((value) => {
       const nextLast: QueueNode<T> = { value }
       if (this.last === undefined) {
         this.last = nextLast

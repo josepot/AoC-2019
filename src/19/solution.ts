@@ -1,5 +1,5 @@
-import { intCodeProcessor } from "utils/ts/intCodeGenerator"
-import add from "utils/ts/add"
+import { intCodeProcessor } from "utils/intCodeGenerator"
+import add from "utils/add"
 
 const solution1 = async ([line]: string[]) => {
   const inputs = Array(50)
@@ -11,12 +11,14 @@ const solution1 = async ([line]: string[]) => {
     )
     .flat()
 
-  return inputs.map(input => intCodeProcessor(line, x => x, input)).reduce(add)
+  return inputs
+    .map((input) => intCodeProcessor(line, (x) => x, input))
+    .reduce(add)
 }
 
 const solution2 = ([line]: string[]) => {
   const getValueAtPosition = (x: number, y: number) =>
-    intCodeProcessor(line, x => x, [x, y])
+    intCodeProcessor(line, (x) => x, [x, y])
 
   const getLastBeamAtLine = (y: number, previousX: number) => {
     let current: number

@@ -11,8 +11,8 @@ const graphDistinctSearch = <T extends { id: string }>(
     (node: T) => {
       const nodes = analizeNode(node)
       if (nodes === true) return nodes
-      const result = nodes.filter(x => !analized.has(x.id))
-      result.forEach(x => analized.add(x.id))
+      const result = nodes.filter((x) => !analized.has(x.id))
+      result.forEach((x) => analized.add(x.id))
       return result
     },
     comparator,

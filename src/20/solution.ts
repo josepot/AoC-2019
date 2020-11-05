@@ -2,8 +2,8 @@ import {
   Position,
   getAdjacentPositions,
   getPositionFromKey,
-} from "utils/ts/directions"
-import graphDistinctSearch from "utils/ts/graphDistinctSearch"
+} from "utils/directions"
+import graphDistinctSearch from "utils/graphDistinctSearch"
 
 const getIsInner = (key: string): boolean => {
   const position = getPositionFromKey(key)
@@ -23,7 +23,7 @@ const solution1 = (
   endPositionKey: string,
 ) => {
   const getAdjacentPositionsWithPortals = (currentPos: Position): string[] => {
-    const adjacent = getAdjacentPositions(currentPos).map(x => [
+    const adjacent = getAdjacentPositions(currentPos).map((x) => [
       x.key,
       positions.get(x.key)!,
     ])
@@ -38,7 +38,7 @@ const solution1 = (
       .filter(([portalId]) => portalId !== "AA" && portalId !== "ZZ")
       .map(([portalId]) => {
         const [exit] = [...portalExits.get(portalId)!].filter(
-          x => x !== currentPos.key,
+          (x) => x !== currentPos.key,
         )
         return exit
       })
@@ -54,9 +54,9 @@ const solution1 = (
 
   return graphDistinctSearch(
     initialNode,
-    current =>
+    (current) =>
       current.id === endPositionKey ||
-      getAdjacentPositionsWithPortals(current.position).map(id => ({
+      getAdjacentPositionsWithPortals(current.position).map((id) => ({
         id,
         position: getPositionFromKey(id),
         steps: current.steps + 1,
@@ -76,7 +76,7 @@ const solution2 = (
     currentPos: Position,
     level: number,
   ): [string, number][] => {
-    const adjacent = getAdjacentPositions(currentPos).map(x => [
+    const adjacent = getAdjacentPositions(currentPos).map((x) => [
       x.key,
       positions.get(x.key)!,
     ])
@@ -91,7 +91,7 @@ const solution2 = (
       .filter(([portalId]) => portalId !== "AA" && portalId !== "ZZ")
       .map(([portalId, isInner]) => {
         const exit = [...portalExits.get(portalId)!].filter(
-          x => x !== currentPos.key,
+          (x) => x !== currentPos.key,
         )[0]!
         const nextLevel = level + (isInner ? 1 : -1)
 
@@ -111,7 +111,7 @@ const solution2 = (
 
   return graphDistinctSearch(
     initialNode,
-    current =>
+    (current) =>
       current.id === `${endPositionKey},0` ||
       getAdjacentPositionsWithPortals(current.position, current.level).map(
         ([posId, level]) => ({
@@ -125,7 +125,7 @@ const solution2 = (
   ).steps
 }
 
-export default [solution1, solution2].map(fn => (lines: string[]) => {
+export default [solution1, solution2].map((fn) => (lines: string[]) => {
   const positions = new Map<string, string>()
   const portalEntries = new Map<string, [string, boolean]>()
   const portalExits = new Map<string, Set<string>>()
@@ -139,11 +139,11 @@ export default [solution1, solution2].map(fn => (lines: string[]) => {
   ;[...positions.entries()].forEach(([posId, val]) => {
     if (isLetter(val)) {
       const [[posIdB, valB]] = getAdjacentPositions(getPositionFromKey(posId))
-        .map(x => [x.key, positions.get(x.key)])
+        .map((x) => [x.key, positions.get(x.key)])
         .filter(([_, val]) => isLetter(val))
 
       let spacesAround = getAdjacentPositions(getPositionFromKey(posId))
-        .map(x => [x.key, positions.get(x.key)])
+        .map((x) => [x.key, positions.get(x.key)])
         .filter(([_, val]) => val === ".")
 
       const portalId = [val, valB].sort().join("")
@@ -152,7 +152,7 @@ export default [solution1, solution2].map(fn => (lines: string[]) => {
 
       if (spacesAround.length === 0) {
         spacesAround = getAdjacentPositions(getPositionFromKey(posIdB!))
-          .map(x => [x.key, positions.get(x.key)])
+          .map((x) => [x.key, positions.get(x.key)])
           .filter(([_, val]) => val === ".")
       }
       const exit = spacesAround[0]![0]!
